@@ -1,8 +1,8 @@
 #!/bin/bash
-# graphs1090 Theme: Aviation
+# adsb-graphs Theme: Aviation
 # Dark phosphor-green terminal / radar aesthetic
 # ------------------------------------------------
-# Paste these --color flags into your rrdtool graph calls in graphs1090.sh
+# Paste these --color flags into your rrdtool graph calls in adsb-graphs.sh
 # (add them to the COLORS variable or directly into each graph function)
 
 COLORS="

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if diff /usr/share/graphs1090/malarky.conf /etc/systemd/system/collectd.service.d/malarky.conf \
+if diff /usr/share/adsb-graphs/malarky.conf /etc/systemd/system/collectd.service.d/malarky.conf \
     && grep -qs -e 'DataDir "/run/collectd"' /etc/collectd/collectd.conf \
-    && grep -qs -e 'DB=/run/collectd' /etc/default/graphs1090
+    && grep -qs -e 'DB=/run/collectd' /etc/default/adsb-graphs
 then
     echo ---------
     echo write reducing measures already enabled, no need to do anything for this script!
@@ -15,19 +15,19 @@ systemctl stop collectd &>/dev/null
 set -e
 mkdir -p /etc/systemd/system/collectd.service.d
 rm -f /etc/systemd/system/collectd.service
-cp -f /usr/share/graphs1090/malarky.conf /etc/systemd/system/collectd.service.d/malarky.conf
+cp -f /usr/share/adsb-graphs/malarky.conf /etc/systemd/system/collectd.service.d/malarky.conf
 set +e
 sed -i -e 's?DataDir.*?DataDir "/run/collectd"?' /etc/collectd/collectd.conf
 
-if ! grep -qs -e '^DB=' /etc/default/graphs1090; then
-    echo "DB=" >>/etc/default/graphs1090
+if ! grep -qs -e '^DB=' /etc/default/adsb-graphs; then
+    echo "DB=" >>/etc/default/adsb-graphs
 fi
 
-sed -i -e 's#^DB=.*#DB=/run/collectd#' /etc/default/graphs1090
+sed -i -e 's#^DB=.*#DB=/run/collectd#' /etc/default/adsb-graphs
 
 systemctl daemon-reload
 systemctl restart collectd
-systemctl restart graphs1090
+systemctl restart adsb-graphs
 
 cat >/etc/cron.d/collectd_to_disk <<"EOF"
 # restart collectd so data is saved to disk
@@ -35,9 +35,9 @@ cat >/etc/cron.d/collectd_to_disk <<"EOF"
 EOF
 
 # remove legacy stuff
-rm -rf "$TARGET/graphs1090-writeback-backup1" "$TARGET/graphs1090-writeback-backup2"
+rm -rf "$TARGET/adsb-graphs-writeback-backup1" "$TARGET/adsb-graphs-writeback-backup2"
 
-rm -f /usr/share/graphs1090/noMalarky
+rm -f /usr/share/adsb-graphs/noMalarky
 
 echo ---------
 echo write reducing measures enabled!

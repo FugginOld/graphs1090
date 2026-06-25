@@ -16,7 +16,7 @@ systemctl stop collectd
 cp -T -n localhost.tar.gz $date-new-format-backup.tar.gz
 
 systemctl stop collectd
-/usr/share/graphs1090/gunzip.sh /var/lib/collectd/rrd/localhost
+/usr/share/adsb-graphs/gunzip.sh /var/lib/collectd/rrd/localhost
 
 cp -T -r -n localhost $date
 cp -T -r localhost $tmp
@@ -39,7 +39,7 @@ sleep 60
 echo 2 minutes left
 sleep 60
 systemctl stop collectd
-/usr/share/graphs1090/gunzip.sh /var/lib/collectd/rrd/localhost
+/usr/share/adsb-graphs/gunzip.sh /var/lib/collectd/rrd/localhost
 
 
 for file in $(cd /var/lib/collectd/rrd/localhost/; find | grep '\.rrd')
@@ -50,7 +50,7 @@ done
 cp -T -r -n $tmp localhost
 systemctl start collectd
 
-systemctl restart graphs1090
+systemctl restart adsb-graphs
 
 echo
 echo

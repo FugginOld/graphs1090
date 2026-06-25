@@ -7,7 +7,7 @@ if [[ -z "$1" ]] || [[ -z "$2" ]]; then
 fi
 
 systemctl stop collectd || true
-/usr/share/graphs1090/gunzip.sh "$1"
+/usr/share/adsb-graphs/gunzip.sh "$1"
 
 tmp="$2.tmp"
 rm -rf "$2" "$tmp"

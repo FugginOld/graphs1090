@@ -1,4 +1,4 @@
-/* graphs1090 — themed dashboard
+/* adsb-graphs — themed dashboard
    Page chrome is driven by [data-theme] CSS variables. The graph PNGs carry
    their own colors (rendered per theme into graphs/<theme>/), so switching a
    theme swaps both the chrome vars (here) and the image folder (graphs.js). */

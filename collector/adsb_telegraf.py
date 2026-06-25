@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""graphs1090 Telegraf collector.
+"""adsb-graphs Telegraf collector.
 
 Fetches the same dump1090/readsb JSON the legacy collectd plugin used and emits
 InfluxDB line protocol on stdout. Two run modes:
@@ -29,7 +29,7 @@ from adsb_stats import compute_aircraft_stats
 
 # ── config ────────────────────────────────────────────────────────────────────
 
-DEFAULT_CONF = '/usr/share/graphs1090/adsb_collector.conf'
+DEFAULT_CONF = '/usr/share/adsb-graphs/adsb_collector.conf'
 
 
 def load_config():

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DOCUMENTROOT=/run/graphs1090
+DOCUMENTROOT=/run/adsb-graphs
 
 renice -n 20 -p $$
 
@@ -39,10 +39,10 @@ graph_size=default
 # set_palette <theme> sets CANVAS, the rrdtool -c color flags ($colors) and the
 # data-series hex variables every graph function uses. Six themes ship: the two
 # "orig" schemes are the classic light/dark palettes; the four new ones extend
-# the 5 seed colors from graphs1090-themes/*.sh into the full palette the graph
+# the 5 seed colors from adsb-graphs-themes/*.sh into the full palette the graph
 # functions need. Edit the hex below to tune any theme.
 set_palette() {
-    # --- orig-light defaults (graphs1090 classic light scheme) ---
+    # --- orig-light defaults (adsb-graphs classic light scheme) ---
     CANVAS=FFFFFF
     colors=""
     LGREEN=7de87d; GREEN=32CD32; DGREEN=228B22
@@ -159,9 +159,9 @@ set_palette() {
     esac
 }
 
-source /usr/share/graphs1090/resolve-config.sh
+source /usr/share/adsb-graphs/resolve-config.sh
 
-source /etc/default/graphs1090
+source /etc/default/adsb-graphs
 
 if [[ -n $ether ]]; then
     ether="interface-${ether}"
@@ -1509,7 +1509,7 @@ if [[ -z $1 ]]; then
 	period="24h"
 fi
 
-# Themes to generate. Override in /etc/default/graphs1090, e.g.
+# Themes to generate. Override in /etc/default/adsb-graphs, e.g.
 #   graph_themes="orig-light night retro"
 # Each theme is rendered into a graphs/<theme>/ subfolder; the web page swaps
 # folders to switch theme live.

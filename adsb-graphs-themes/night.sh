@@ -1,5 +1,5 @@
 #!/bin/bash
-# graphs1090 Theme: Night
+# adsb-graphs Theme: Night
 # Dark navy dashboard with indigo/purple accents
 # ------------------------------------------------
 

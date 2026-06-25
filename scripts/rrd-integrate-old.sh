@@ -16,7 +16,7 @@ fi
 
 
 systemctl stop collectd
-/usr/share/graphs1090/gunzip.sh /var/lib/collectd/rrd/localhost
+/usr/share/adsb-graphs/gunzip.sh /var/lib/collectd/rrd/localhost
 
 cd /var/lib/collectd/rrd
 
@@ -30,7 +30,7 @@ do
 done
 
 systemctl start collectd
-systemctl restart graphs1090
+systemctl restart adsb-graphs
 
 echo
 echo

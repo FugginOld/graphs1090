@@ -7,7 +7,7 @@
   "liveNow": false,
   "panels": [
     {
-      "datasource": { "type": "influxdb", "uid": "graphs1090" },
+      "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -28,7 +28,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "user",
           "measurement": "cpu",
           "policy": "default",
@@ -38,7 +38,7 @@
           "tags": [ { "key": "cpu", "operator": "=", "value": "cpu-total" } ]
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "system",
           "measurement": "cpu",
           "policy": "default",
@@ -48,7 +48,7 @@
           "tags": [ { "key": "cpu", "operator": "=", "value": "cpu-total" } ]
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "iowait",
           "measurement": "cpu",
           "policy": "default",
@@ -60,7 +60,7 @@
       ]
     },
     {
-      "datasource": { "type": "influxdb", "uid": "graphs1090" },
+      "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -79,7 +79,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "used",
           "measurement": "mem",
           "policy": "default",
@@ -89,7 +89,7 @@
           "tags": []
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "cached",
           "measurement": "mem",
           "policy": "default",
@@ -99,7 +99,7 @@
           "tags": []
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "buffered",
           "measurement": "mem",
           "policy": "default",
@@ -109,7 +109,7 @@
           "tags": []
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "available",
           "measurement": "mem",
           "policy": "default",
@@ -121,7 +121,7 @@
       ]
     },
     {
-      "datasource": { "type": "influxdb", "uid": "graphs1090" },
+      "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -142,7 +142,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "$tag_path",
           "measurement": "disk",
           "policy": "default",
@@ -154,7 +154,7 @@
       ]
     },
     {
-      "datasource": { "type": "influxdb", "uid": "graphs1090" },
+      "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -173,7 +173,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "read $tag_name",
           "measurement": "diskio",
           "policy": "default",
@@ -183,7 +183,7 @@
           "tags": []
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "write $tag_name",
           "measurement": "diskio",
           "policy": "default",
@@ -195,7 +195,7 @@
       ]
     },
     {
-      "datasource": { "type": "influxdb", "uid": "graphs1090" },
+      "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -214,7 +214,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "recv $tag_interface",
           "measurement": "net",
           "policy": "default",
@@ -224,7 +224,7 @@
           "tags": []
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "sent $tag_interface",
           "measurement": "net",
           "policy": "default",
@@ -236,7 +236,7 @@
       ]
     },
     {
-      "datasource": { "type": "influxdb", "uid": "graphs1090" },
+      "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -255,7 +255,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "$tag_sensor",
           "measurement": "temp",
           "policy": "default",
@@ -270,12 +270,12 @@
   "refresh": "1m",
   "schemaVersion": 36,
   "style": "dark",
-  "tags": ["graphs1090", "system"],
+  "tags": ["adsb-graphs", "system"],
   "templating": { "list": [] },
   "time": { "from": "now-3h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
   "title": "System",
-  "uid": "graphs1090-system",
+  "uid": "adsb-graphs-system",
   "version": 1
 }

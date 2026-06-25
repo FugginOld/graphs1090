@@ -1,17 +1,17 @@
 #!/bin/bash
 
-ipath=/usr/share/graphs1090
+ipath=/usr/share/adsb-graphs
 systemctl stop collectd
-systemctl disable --now graphs1090
+systemctl disable --now adsb-graphs
 
-/usr/share/graphs1090/gunzip.sh /var/lib/collectd/rrd/localhost
+/usr/share/adsb-graphs/gunzip.sh /var/lib/collectd/rrd/localhost
 
 rm -f /etc/systemd/system/collectd.service.d/malarky.conf
 rm -f /etc/systemd/system/collectd.service
-mv /etc/collectd/collectd.conf.graphs1090 /etc/collectd/collectd.conf &>/dev/null
-rm -f /etc/cron.d/cron-graphs1090
+mv /etc/collectd/collectd.conf.adsb-graphs /etc/collectd/collectd.conf &>/dev/null
+rm -f /etc/cron.d/cron-adsb-graphs
 
-lighty-disable-mod graphs1090 >/dev/null
+lighty-disable-mod adsb-graphs >/dev/null
 
 systemctl daemon-reload
 systemctl restart collectd

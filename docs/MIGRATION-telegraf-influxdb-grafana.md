@@ -12,7 +12,7 @@ The current stack couples three concerns into one fixed pipeline:
 |---|---|---|
 | Collect | `collectd` + custom Python plugins | Pinned to collectd's lifecycle, hard-coded disk/interface device lists |
 | Store | RRDtool round-robin files | Fixed retention/resolution baked at create time; colors-in-PNG forces 6× render cost for themes |
-| Visualize | `graphs1090.sh` renders PNGs every cycle | No zoom/pan, no ad-hoc range, CPU burned on every render, theme = N× the work |
+| Visualize | `adsb-graphs.sh` renders PNGs every cycle | No zoom/pan, no ad-hoc range, CPU burned on every render, theme = N× the work |
 
 Target stack separates them:
 
@@ -23,7 +23,7 @@ SDR decoder (readsb / dump1090-fa / dump978 / airspy_adsb)
 Telegraf  ── inputs.execd (ported collector)  + native inputs.{cpu,mem,disk,diskio,net,temp}
         │  InfluxDB line protocol
         ▼
-InfluxDB v1.x   (database: graphs1090, retention policies / continuous queries)
+InfluxDB v1.x   (database: adsb-graphs, retention policies / continuous queries)
         │  InfluxQL
         ▼
 Grafana   (provisioned datasource + dashboards; renders on demand, themes are free)
@@ -44,8 +44,8 @@ Grafana   (provisioned datasource + dashboards; renders on demand, themes are fr
 | `lib/system_stats.py` (`/proc/meminfo`) | Replace | `inputs.mem` covers it natively. |
 | `config/collectd.conf` built-in plugins (cpu/df/disk/interface/table) | Replace | `inputs.{cpu,disk,diskio,net,temp}` — auto-detect, no device lists. |
 | `lib/dump1090.db` (RRD type defs) | Drop | InfluxDB is schemaless. |
-| `scripts/graphs1090.sh` (PNG render) | Drop | Grafana dashboards replace it. |
-| `scripts/service-graphs1090.sh` (render loop) | Drop | No render loop needed. |
+| `scripts/adsb-graphs.sh` (PNG render) | Drop | Grafana dashboards replace it. |
+| `scripts/service-adsb-graphs.sh` (render loop) | Drop | No render loop needed. |
 | `config/http/*.conf` (lighttpd vhost) | Optional keep | Only if you want the old PNG viewer during transition, or to reverse-proxy Grafana. |
 | Receiver autodetect logic in `install.sh` (readsb/dump1090-fa/etc.) | **Reuse** | Same detection feeds the collector's URL. |
 | RRD history in `/var/lib/collectd/rrd` | See §7 | Optional one-shot import; default is start-fresh. |
@@ -55,7 +55,7 @@ Grafana   (provisioned datasource + dashboards; renders on demand, themes are fr
 ## 3. Target repo layout
 
 ```
-graphs1090/
+adsb-graphs/
 ├── install.sh                         # rewritten: add repos, install, provision, autodetect
 ├── uninstall.sh                       # rewritten: remove new stack (+ optional old-stack purge)
 ├── collector/
@@ -138,7 +138,7 @@ System metrics (`cpu`, `mem`, `disk`, `diskio`, `net`, `temp`) come from native 
 | **CPU temperature** | `inputs.temp` (gopsutil) works on most x86 + many SBCs. Pi/SBC thermal-zone fallback: `inputs.exec` reading `/sys/class/thermal/thermal_zone*/temp` (replaces the collectd `table` plugin; keeps the existing `TEMP_MULTIPLIER` idea). |
 | **Disk/Net devices** | Native inputs auto-enumerate — removes per-board config entirely. |
 | **Memory math** | `inputs.mem` reports htop-style `used`/`available`; matches `system_stats.py` intent without custom `/proc/meminfo` parsing. |
-| **systemd** | `telegraf`, `influxdb`, `grafana-server` ship their own units. We drop the `graphs1090.service` render loop. |
+| **systemd** | `telegraf`, `influxdb`, `grafana-server` ship their own units. We drop the `adsb-graphs.service` render loop. |
 | **Low-RAM boards (Pi 3 / 1 GB)** | Document the lean profile: single retention policy, Grafana `GF_ANALYTICS` off, `inputs.execd` (not exec), InfluxDB `cache-max-memory-size` tuned. Rough idle footprint ≈ Telegraf 20 MB + InfluxDB 50 MB + Grafana 80 MB ≈ 150 MB. |
 
 ---
@@ -201,7 +201,7 @@ Recommend offering import as a clearly-labeled optional step, not part of the de
 3. **Old-stack coexistence** — ✅ non-destructive: bring-up installs alongside collectd/RRD; PNG viewer stays until Phase D sign-off.
 4. **Grafana exposure** — ✅ bare `:3000` for the slice; reverse-proxy behind the existing web path is the Phase-C target.
 5. **execd vs exec** — ✅ `inputs.execd` default, `inputs.exec --once` documented fallback (both implemented in `adsb_telegraf.py`).
-6. **Repo identity** — ✅ evolve `graphs1090` in place.
+6. **Repo identity** — ✅ evolve `adsb-graphs` in place.
 
 ---
 
@@ -239,7 +239,7 @@ Recommend offering import as a clearly-labeled optional step, not part of the de
 | `collector/adsb_telegraf.py` | Collector → line protocol; `execd` + `--once` modes. |
 | `collector/adsb_collector.conf.example` | Receiver URL / instance config. |
 | `telegraf/telegraf.conf` + `telegraf.d/10-adsb.conf` | Agent + `inputs.execd` + `outputs.influxdb`. |
-| `influxdb/retention.iql` | Creates `graphs1090` DB + `forever` RP. |
+| `influxdb/retention.iql` | Creates `adsb-graphs` DB + `forever` RP. |
 | `grafana/provisioning/**` | Datasource + provider + `adsb.json` (Aircraft Seen, Message Rate). |
 | `collector/bringup-slice.sh` | Non-destructive Phase-A install on Debian/Ubuntu/Raspbian. |
 | `tests/test_adsb_telegraf.py` | Unit tests over the line builders. |
@@ -327,15 +327,15 @@ On real hardware: `sudo bash collector/bringup-slice.sh` installs all Phase A+B 
 1. Reconfigures Grafana to serve from `/grafana/` sub-path (`GF_SERVER_ROOT_URL` + `GF_SERVER_SERVE_FROM_SUB_PATH`).
 2. Installs lighttpd `90-grafana-proxy.conf` or appends nginx `/grafana/` proxy block, auto-detecting which web server is active.
 3. Reloads the web server.
-4. Old `/graphs1090/` PNGs keep serving unchanged as a fallback.
+4. Old `/adsb-graphs/` PNGs keep serving unchanged as a fallback.
 
 **`config/http/90-grafana-proxy.conf`** — lighttpd `mod_proxy` snippet (WebSocket-capable).
 
-**`config/http/nginx-graphs1090.conf`** — updated: legacy ADS-B locations + new `/grafana/` proxy location in a single file.
+**`config/http/nginx-adsb-graphs.conf`** — updated: legacy ADS-B locations + new `/grafana/` proxy location in a single file.
 
 **`bringup-slice.sh`** — updated to also install `20-system.conf` and `system.json` (Phase B files added after the script was first written).
 
-Exit criterion: Grafana reachable at `http://<host>/grafana/`; old PNGs still at `/graphs1090/`.
+Exit criterion: Grafana reachable at `http://<host>/grafana/`; old PNGs still at `/adsb-graphs/`.
 
 ---
 
@@ -345,11 +345,11 @@ Exit criterion: Grafana reachable at `http://<host>/grafana/`; old PNGs still at
 
 - Requires typing `yes` to proceed (irreversibility gate).
 - Stops + disables collectd.
-- Removes legacy PNG render assets from `/usr/share/graphs1090/` (keeps new collector files).
+- Removes legacy PNG render assets from `/usr/share/adsb-graphs/` (keeps new collector files).
 - Removes PNG output tmpfs and `/etc/fstab` entry.
-- Optional: removes `/graphs1090/` web conf (strips legacy blocks, keeps `/grafana/` block).
+- Optional: removes `/adsb-graphs/` web conf (strips legacy blocks, keeps `/grafana/` block).
 - Optional: `apt-get purge collectd collectd-core`.
 - Does **not** touch `/var/lib/collectd/rrd/` (historical data; user deletes manually).
 - Does **not** touch Telegraf, InfluxDB, or Grafana.
 
-Exit criterion: only the Telegraf/InfluxDB/Grafana stack remains; `influx -database graphs1090 -execute 'SHOW MEASUREMENTS'` lists all measurements; Grafana panels show live data.
+Exit criterion: only the Telegraf/InfluxDB/Grafana stack remains; `influx -database adsb-graphs -execute 'SHOW MEASUREMENTS'` lists all measurements; Grafana panels show live data.

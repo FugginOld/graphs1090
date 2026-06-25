@@ -1,5 +1,5 @@
 #!/bin/bash
-# graphs1090 Theme: Minimal
+# adsb-graphs Theme: Minimal
 # Clean light background, muted modern data colors
 # ------------------------------------------------
 

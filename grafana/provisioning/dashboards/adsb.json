@@ -7,7 +7,7 @@
   "liveNow": false,
   "panels": [
     {
-      "datasource": { "type": "influxdb", "uid": "graphs1090" },
+      "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -26,7 +26,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "total",
           "measurement": "adsb_aircraft",
           "policy": "default",
@@ -36,7 +36,7 @@
           "tags": [ { "key": "band", "operator": "=", "value": "1090" } ]
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "with positions",
           "measurement": "adsb_aircraft",
           "policy": "default",
@@ -46,7 +46,7 @@
           "tags": [ { "key": "band", "operator": "=", "value": "1090" } ]
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "mlat",
           "measurement": "adsb_aircraft",
           "policy": "default",
@@ -58,7 +58,7 @@
       ]
     },
     {
-      "datasource": { "type": "influxdb", "uid": "graphs1090" },
+      "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -77,7 +77,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "local/s",
           "measurement": "adsb_messages",
           "policy": "default",
@@ -91,7 +91,7 @@
           "tags": []
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "positions/s",
           "measurement": "adsb_messages",
           "policy": "default",
@@ -107,7 +107,7 @@
       ]
     },
     {
-      "datasource": { "type": "influxdb", "uid": "graphs1090" },
+      "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -128,7 +128,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "max range",
           "measurement": "adsb_range",
           "policy": "default",
@@ -138,7 +138,7 @@
           "tags": [ { "key": "band", "operator": "=", "value": "1090" } ]
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "median",
           "measurement": "adsb_range",
           "policy": "default",
@@ -148,7 +148,7 @@
           "tags": [ { "key": "band", "operator": "=", "value": "1090" } ]
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "q1",
           "measurement": "adsb_range",
           "policy": "default",
@@ -158,7 +158,7 @@
           "tags": [ { "key": "band", "operator": "=", "value": "1090" } ]
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "q3",
           "measurement": "adsb_range",
           "policy": "default",
@@ -170,7 +170,7 @@
       ]
     },
     {
-      "datasource": { "type": "influxdb", "uid": "graphs1090" },
+      "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -189,7 +189,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "peak",
           "measurement": "adsb_signal",
           "policy": "default",
@@ -199,7 +199,7 @@
           "tags": [ { "key": "band", "operator": "=", "value": "1090" } ]
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "median",
           "measurement": "adsb_signal",
           "policy": "default",
@@ -209,7 +209,7 @@
           "tags": [ { "key": "band", "operator": "=", "value": "1090" } ]
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "noise",
           "measurement": "adsb_signal",
           "policy": "default",
@@ -219,7 +219,7 @@
           "tags": [ { "key": "band", "operator": "=", "value": "1090" } ]
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "noise floor",
           "measurement": "adsb_signal",
           "policy": "default",
@@ -231,7 +231,7 @@
       ]
     },
     {
-      "datasource": { "type": "influxdb", "uid": "graphs1090" },
+      "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -250,7 +250,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "all/s",
           "measurement": "adsb_tracks",
           "policy": "default",
@@ -264,7 +264,7 @@
           "tags": []
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "single-msg/s",
           "measurement": "adsb_tracks",
           "policy": "default",
@@ -280,7 +280,7 @@
       ]
     },
     {
-      "datasource": { "type": "influxdb", "uid": "graphs1090" },
+      "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -299,7 +299,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "demod",
           "measurement": "adsb_cpu",
           "policy": "default",
@@ -313,7 +313,7 @@
           "tags": []
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "reader",
           "measurement": "adsb_cpu",
           "policy": "default",
@@ -327,7 +327,7 @@
           "tags": []
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "background",
           "measurement": "adsb_cpu",
           "policy": "default",
@@ -343,7 +343,7 @@
       ]
     },
     {
-      "datasource": { "type": "influxdb", "uid": "graphs1090" },
+      "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -362,7 +362,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "gain dB",
           "measurement": "adsb_gain",
           "policy": "default",
@@ -382,7 +382,7 @@
       "type": "row"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "graphs1090" },
+      "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -401,7 +401,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "total",
           "measurement": "adsb_aircraft",
           "policy": "default",
@@ -411,7 +411,7 @@
           "tags": [ { "key": "band", "operator": "=", "value": "978" } ]
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "with positions",
           "measurement": "adsb_aircraft",
           "policy": "default",
@@ -423,7 +423,7 @@
       ]
     },
     {
-      "datasource": { "type": "influxdb", "uid": "graphs1090" },
+      "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -442,7 +442,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "max range",
           "measurement": "adsb_range",
           "policy": "default",
@@ -452,7 +452,7 @@
           "tags": [ { "key": "band", "operator": "=", "value": "978" } ]
         },
         {
-          "datasource": { "type": "influxdb", "uid": "graphs1090" },
+          "datasource": { "type": "influxdb", "uid": "adsb-graphs" },
           "alias": "median",
           "measurement": "adsb_range",
           "policy": "default",
@@ -466,13 +466,13 @@
   ],
   "refresh": "1m",
   "schemaVersion": 39,
-  "tags": ["graphs1090", "adsb"],
+  "tags": ["adsb-graphs", "adsb"],
   "templating": { "list": [] },
   "time": { "from": "now-6h", "to": "now" },
   "timepicker": {},
   "timezone": "",
-  "title": "graphs1090 — ADS-B",
-  "uid": "graphs1090-adsb",
+  "title": "adsb-graphs — ADS-B",
+  "uid": "adsb-graphs-adsb",
   "version": 3,
   "weekStart": ""
 }

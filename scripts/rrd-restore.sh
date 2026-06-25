@@ -23,11 +23,11 @@ do
 done
 
 systemctl stop collectd
-/usr/share/graphs1090/gunzip.sh "$2"
+/usr/share/adsb-graphs/gunzip.sh "$2"
 rm -rf "$2"
 cp -r -T -f "$tmp" "$2"
 systemctl restart collectd
-systemctl restart graphs1090
+systemctl restart adsb-graphs
 
 rm -rf "$tmp"
 

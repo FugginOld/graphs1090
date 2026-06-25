@@ -3,12 +3,12 @@
 apiVersion: 1
 
 datasources:
-  - name: graphs1090
+  - name: adsb-graphs
     type: influxdb
     access: proxy
     url: http://127.0.0.1:8086
-    database: graphs1090
+    database: adsb-graphs
     isDefault: true
     jsonData:
-      dbName: graphs1090
+      dbName: adsb-graphs
       httpMode: GET

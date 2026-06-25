@@ -1,5 +1,5 @@
 # after saving this file, run
-# sudo systemctl restart graphs1090
+# sudo systemctl restart adsb-graphs
 # to update the graphs and web interface
 
 # how often graphs are drawn in seconds (default: 60)
@@ -21,7 +21,7 @@ colorscheme=default
 graph_size=default
 
 # make the small graphs as large as the big ones
-# run "sudo /usr/share/graphs1090/boot.sh" to adjust the web interface
+# run "sudo /usr/share/adsb-graphs/boot.sh" to adjust the web interface
 all_large=no
 
 # font size, default 10.0 (relative to graph size)
@@ -85,14 +85,14 @@ wifi=
 TEMP_MULTIPLIER=1000
 
 # the text showing in the tab button
-WWW_TITLE="graphs1090"
+WWW_TITLE="adsb-graphs"
 # the text shown at the top of the webpage
 WWW_HEADER="Performance Graphs"
 
 # set to yes to hide system graphs from the web page and not waste CPU either to create the pngs
 HIDE_SYSTEM=no
 # this does not turn off the data collection for the system stats as automatic changes to collectd.conf are somewhat complicated
-# you can use /usr/share/graphs1090/git/hide_system-collectd.conf though, that's up to you to copy to /etc/collectd/collectd.conf
+# you can use /usr/share/adsb-graphs/git/hide_system-collectd.conf though, that's up to you to copy to /etc/collectd/collectd.conf
 # that collectd.conf by default has 978 data collection disabled, if you want to enable it, uncomment the URL_978 line
 
 # this variable is ignored if /run/collectd/localhost exists, in that case /run/collectd is used

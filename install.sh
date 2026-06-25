@@ -4,15 +4,15 @@ set -e
 trap 'echo "[ERROR] Error in line $LINENO when executing: $BASH_COMMAND"' ERR
 renice 10 $$
 
-repo="https://github.com/FugginOld/graphs1090"
-ipath=/usr/share/graphs1090
+repo="https://github.com/FugginOld/adsb-graphs"
+ipath=/usr/share/adsb-graphs
 install=0
 
 commands="git rrdtool wget unzip collectd"
 packages="git rrdtool wget unzip bash-builtins collectd-core"
 
 mkdir -p $ipath/installed
-mkdir -p /var/lib/graphs1090/scatter
+mkdir -p /var/lib/adsb-graphs/scatter
 
 hash -r
 for CMD in $commands
@@ -106,7 +106,7 @@ if [[ "$1" != "test" ]] && [[ "$1" != "reinstall" ]]; then
     remote_version=$(wget --timeout=10 -q -O - "$repo/raw/master/version" 2>/dev/null | head -1) || true
     local_version=$(head -1 "$ipath/version" 2>/dev/null) || true
     if [[ -n "$remote_version" ]] && [[ -n "$local_version" ]] && [[ "$remote_version" == "$local_version" ]] && [[ -f "$ipath/html/index.html" ]]; then
-        echo "graphs1090 is already up to date ($local_version)"
+        echo "adsb-graphs is already up to date ($local_version)"
         exit 0
     fi
 fi
@@ -118,7 +118,7 @@ elif getGIT "$repo" "master" "$ipath/git" && cd "$ipath/git"; then
     true
 elif wget --timeout=30 -q -O /tmp/master.zip $repo/archive/master.zip && unzip -q -o master.zip
 then
-	cd /tmp/graphs1090-master
+	cd /tmp/adsb-graphs-master
 else
 	echo "Unable to download files, exiting! (Maybe try again?)"
 	exit 1
@@ -147,10 +147,10 @@ cp install.sh uninstall.sh $ipath
 cp config/malarky.conf $ipath
 chmod u+x $ipath/*.sh
 if ! grep -e 'system_stats' -qs /etc/collectd/collectd.conf &>/dev/null; then
-	cp /etc/collectd/collectd.conf /etc/collectd/collectd.conf.graphs1090 &>/dev/null || true
+	cp /etc/collectd/collectd.conf /etc/collectd/collectd.conf.adsb-graphs &>/dev/null || true
 	cp config/collectd.conf /etc/collectd/collectd.conf
 	echo "------------------"
-	echo "Overwriting /etc/collectd/collectd.conf, the old file has been moved to /etc/collectd/collectd.conf.graphs1090"
+	echo "Overwriting /etc/collectd/collectd.conf, the old file has been moved to /etc/collectd/collectd.conf.adsb-graphs"
 	echo "------------------"
 fi
 if ! grep -qs -e 'RRATimespan 576288000' /etc/collectd/collectd.conf &>/dev/null; then
@@ -175,19 +175,19 @@ sed -i -e '/<Plugin "interface">/{a\
     esac
 done
 
-rm -f /etc/cron.d/cron-graphs1090
+rm -f /etc/cron.d/cron-adsb-graphs
 if [[ "$1" != "test" ]]; then
     cp version $ipath
 else
     echo "$(head -1 version | tr -d '\n')-test" > $ipath/version
 fi
 cp -r html $ipath
-sed -i -e 's|<span id="graphs1090-version">.*</span>|<span id="graphs1090-version"> '"$(head -1 $ipath/version)"'</span>|' "$ipath/html/index.html"
-copyNoClobber config/default /etc/default/graphs1090
+sed -i -e 's|<span id="adsb-graphs-version">.*</span>|<span id="adsb-graphs-version"> '"$(head -1 $ipath/version)"'</span>|' "$ipath/html/index.html"
+copyNoClobber config/default /etc/default/adsb-graphs
 cp config/default $ipath/default-config
 cp config/collectd.conf $ipath/default-collectd.conf
-cp config/service.service /lib/systemd/system/graphs1090.service
-cp config/http/nginx-graphs1090.conf $ipath
+cp config/service.service /lib/systemd/system/adsb-graphs.service
+cp config/http/nginx-adsb-graphs.conf $ipath
 
 if [ -d /etc/lighttpd/conf.d/ ] && ! [ -d /etc/lighttpd/conf-enabled/ ] && ! [ -d /etc/lighttpd/conf-available ] && command -v lighttpd &>/dev/null
 then
@@ -200,11 +200,11 @@ then
 fi
 
 if [[ $lighttpd == yes ]]; then
-    cp config/http/88-graphs1090.conf /etc/lighttpd/conf-available
-    ln -snf /etc/lighttpd/conf-available/88-graphs1090.conf /etc/lighttpd/conf-enabled/88-graphs1090.conf
+    cp config/http/88-adsb-graphs.conf /etc/lighttpd/conf-available
+    ln -snf /etc/lighttpd/conf-available/88-adsb-graphs.conf /etc/lighttpd/conf-enabled/88-adsb-graphs.conf
 
-    cp config/http/95-graphs1090-otherport.conf /etc/lighttpd/conf-available
-    ln -snf /etc/lighttpd/conf-available/95-graphs1090-otherport.conf /etc/lighttpd/conf-enabled/95-graphs1090-otherport.conf
+    cp config/http/95-adsb-graphs-otherport.conf /etc/lighttpd/conf-available
+    ln -snf /etc/lighttpd/conf-available/95-adsb-graphs-otherport.conf /etc/lighttpd/conf-enabled/95-adsb-graphs-otherport.conf
 
     if ! grep -qs -E -e '^[^#]*"mod_alias"' /etc/lighttpd/lighttpd.conf /etc/lighttp/conf-enabled/* /etc/lighttpd/external.conf; then
         echo 'server.modules += ( "mod_alias" )' > /etc/lighttpd/conf-available/07-mod_alias.conf
@@ -214,36 +214,36 @@ if [[ $lighttpd == yes ]]; then
     fi
 fi
 
-SYM=/usr/share/graphs1090/data-symlink
+SYM=/usr/share/adsb-graphs/data-symlink
 mkdir -p $SYM
 if [ -f /run/dump1090-fa/stats.json ]; then
     ln -snf /run/dump1090-fa $SYM/data
-    sed -i -e 's?URL .*?URL "file:///usr/share/graphs1090/data-symlink"?' /etc/collectd/collectd.conf
+    sed -i -e 's?URL .*?URL "file:///usr/share/adsb-graphs/data-symlink"?' /etc/collectd/collectd.conf
 elif [ -f /run/readsb/stats.json ]; then
     ln -snf /run/readsb $SYM/data
-    sed -i -e 's?URL .*?URL "file:///usr/share/graphs1090/data-symlink"?' /etc/collectd/collectd.conf
+    sed -i -e 's?URL .*?URL "file:///usr/share/adsb-graphs/data-symlink"?' /etc/collectd/collectd.conf
 elif [ -f /run/adsbexchange-feed/stats.json ]; then
     ln -snf /run/adsbexchange-feed $SYM/data
-    sed -i -e 's?URL .*?URL "file:///usr/share/graphs1090/data-symlink"?' /etc/collectd/collectd.conf
+    sed -i -e 's?URL .*?URL "file:///usr/share/adsb-graphs/data-symlink"?' /etc/collectd/collectd.conf
 elif [ -f /run/dump1090/stats.json ]; then
     ln -snf /run/dump1090 $SYM/data
-    sed -i -e 's?URL .*?URL "file:///usr/share/graphs1090/data-symlink"?' /etc/collectd/collectd.conf
+    sed -i -e 's?URL .*?URL "file:///usr/share/adsb-graphs/data-symlink"?' /etc/collectd/collectd.conf
 elif [ -f /run/dump1090-mutability/stats.json ]; then
     ln -snf /run/dump1090-mutability $SYM/data
-    sed -i -e 's?URL .*?URL "file:///usr/share/graphs1090/data-symlink"?' /etc/collectd/collectd.conf
+    sed -i -e 's?URL .*?URL "file:///usr/share/adsb-graphs/data-symlink"?' /etc/collectd/collectd.conf
 else
     ln -snf /run/readsb $SYM/data
-    sed -i -e 's?URL .*?URL "file:///usr/share/graphs1090/data-symlink"?' /etc/collectd/collectd.conf
+    sed -i -e 's?URL .*?URL "file:///usr/share/adsb-graphs/data-symlink"?' /etc/collectd/collectd.conf
 fi
 
-SYM=/usr/share/graphs1090/978-symlink
+SYM=/usr/share/adsb-graphs/978-symlink
 mkdir -p $SYM
 if [ -f /run/skyaware978/aircraft.json ]; then
     ln -snf /run/skyaware978 $SYM/data
-    sed -i -e 's?.*URL_978 .*?URL_978 "file:///usr/share/graphs1090/978-symlink"?' /etc/collectd/collectd.conf
+    sed -i -e 's?.*URL_978 .*?URL_978 "file:///usr/share/adsb-graphs/978-symlink"?' /etc/collectd/collectd.conf
 elif [ -f /run/adsbexchange-978/aircraft.json ]; then
     ln -snf /run/adsbexchange-978 $SYM/data
-    sed -i -e 's?.*URL_978 .*?URL_978 "file:///usr/share/graphs1090/978-symlink"?' /etc/collectd/collectd.conf
+    sed -i -e 's?.*URL_978 .*?URL_978 "file:///usr/share/adsb-graphs/978-symlink"?' /etc/collectd/collectd.conf
 else
     sed -i -e 's?.*URL_978 .*?#URL_978 "http://localhost/skyaware978"?' /etc/collectd/collectd.conf
 fi
@@ -253,8 +253,8 @@ then
 	echo --------------
 	echo "Some features are not available on jessie!"
 	echo --------------
-	sed -i -e 's/ADDNAN/+/' -e 's/TRENDNAN/TREND/' -e 's/MAXNAN/MAX/' -e 's/MINNAN/MIN/' $ipath/graphs1090.sh
-	sed -i -e '/axis-format/d' $ipath/graphs1090.sh
+	sed -i -e 's/ADDNAN/+/' -e 's/TRENDNAN/TREND/' -e 's/MAXNAN/MAX/' -e 's/MINNAN/MIN/' $ipath/adsb-graphs.sh
+	sed -i -e '/axis-format/d' $ipath/adsb-graphs.sh
 fi
 
 if [[ $lighttpd == yes ]]; then
@@ -287,25 +287,25 @@ if ! systemctl status collectd &>/dev/null; then
     echo --------------
 fi
 
-if ! [[ -f /usr/share/graphs1090/noMalarky ]]; then
+if ! [[ -f /usr/share/adsb-graphs/noMalarky ]]; then
     bash $ipath/malarky.sh
 fi
 
-systemctl enable graphs1090
-systemctl restart graphs1090
+systemctl enable adsb-graphs
+systemctl restart adsb-graphs
 
 #fix readonly remount logic in fr24feed update script
 sed -i -e 's?$(mount | grep " on / " | grep rw)?{ mount | grep " on / " | grep rw; }?' /usr/lib/fr24/fr24feed_updater.sh &>/dev/null || true
 
 echo --------------
 echo --------------
-echo "All done! Graphs available at http://$(ip route get 1.2.3.4 | grep -m1 -o -P 'src \K[0-9,.]*')/graphs1090"
+echo "All done! Graphs available at http://$(ip route get 1.2.3.4 | grep -m1 -o -P 'src \K[0-9,.]*')/adsb-graphs"
 echo "It may take up to 10 minutes until the first data is displayed"
 
 
 if command -v nginx &>/dev/null
 then
 	echo --------------
-	echo "To configure nginx for graphs1090, please add the following line(s) in the server {} section:"
-	echo "include /usr/share/graphs1090/nginx-graphs1090.conf;"
+	echo "To configure nginx for adsb-graphs, please add the following line(s) in the server {} section:"
+	echo "include /usr/share/adsb-graphs/nginx-adsb-graphs.conf;"
 fi

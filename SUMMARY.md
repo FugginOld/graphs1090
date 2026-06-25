@@ -26,9 +26,9 @@ The immediate practical gain is testability: the 14 tests exercise the real filt
 
 ---
 
-## Issue 2 — Graph Manifest (`graphs1090.sh` + `html/graphs.js`)
+## Issue 2 — Graph Manifest (`adsb-graphs.sh` + `html/graphs.js`)
 
-**What changed:** The `show_graph()` function, which mutated `/usr/share/graphs1090/html/index.html` via `sed` to unhide optional panels (UAT 978, Airspy, dump1090-misc), is removed. Instead, `graphs1090.sh` writes a `manifest.json` to the graphs output directory after each generation run. `graphs.js` fetches this file on page load and shows the relevant panels.
+**What changed:** The `show_graph()` function, which mutated `/usr/share/adsb-graphs/html/index.html` via `sed` to unhide optional panels (UAT 978, Airspy, dump1090-misc), is removed. Instead, `adsb-graphs.sh` writes a `manifest.json` to the graphs output directory after each generation run. `graphs.js` fetches this file on page load and shows the relevant panels.
 
 **Observable:**
 - Optional panels (UAT 978, Airspy, dump1090-misc) now appear and disappear based on `manifest.json` rather than inline styles baked into `index.html` at generation time.
@@ -38,19 +38,19 @@ The immediate practical gain is testability: the 14 tests exercise the real filt
 
 **Why it's an improvement:**
 
-The prior design had no single place that represented "which graphs are currently active." That knowledge was split across three files: `graphs1090.sh` knew when to call `show_graph`, `index.html` stored the current visibility state as inline styles, and `graphs.js` checked those inline styles at runtime to decide which image `src` attributes to update. Adding a new optional graph type required coordinated edits to all three files with no mechanism to detect a mismatch.
+The prior design had no single place that represented "which graphs are currently active." That knowledge was split across three files: `adsb-graphs.sh` knew when to call `show_graph`, `index.html` stored the current visibility state as inline styles, and `graphs.js` checked those inline styles at runtime to decide which image `src` attributes to update. Adding a new optional graph type required coordinated edits to all three files with no mechanism to detect a mismatch.
 
 The `show_graph` mechanism was also a side-channel: a graph generation script was responsible for mutating a UI file on disk. These are unrelated concerns. If `index.html` was ever reset (e.g. after a package upgrade), the panels would silently revert to hidden until the next graph generation cycle.
 
-`manifest.json` creates a real **seam** between "what graphs were generated" and "what the UI should display." `graphs1090.sh` writes its output declaration; `graphs.js` reads it. Each side has one job, and the file is the interface. Adding a new optional graph now requires only one change in `graphs1090.sh` (call `register_active_graph`) and one entry in `MANIFEST_PANELS` in `graphs.js` — `index.html` is not touched.
+`manifest.json` creates a real **seam** between "what graphs were generated" and "what the UI should display." `adsb-graphs.sh` writes its output declaration; `graphs.js` reads it. Each side has one job, and the file is the interface. Adding a new optional graph now requires only one change in `adsb-graphs.sh` (call `register_active_graph`) and one entry in `MANIFEST_PANELS` in `graphs.js` — `index.html` is not touched.
 
 ---
 
 ## Issue 3 — Config Resolution (`resolve-config.sh`)
 
-**What changed:** The DB path resolution block (default path, source `/etc/default/graphs1090`, tmpfs autodetect) was copy-pasted identically in both `graphs1090.sh` and `service-graphs1090.sh`. It is now in a single shared file, `resolve-config.sh`, which both scripts source.
+**What changed:** The DB path resolution block (default path, source `/etc/default/adsb-graphs`, tmpfs autodetect) was copy-pasted identically in both `adsb-graphs.sh` and `service-adsb-graphs.sh`. It is now in a single shared file, `resolve-config.sh`, which both scripts source.
 
-**Observable:** No behavior change. `DB` resolves to the same path as before under all conditions. The explanation comment for why the autodetect does not write back to `/etc/default/graphs1090` now lives in one place.
+**Observable:** No behavior change. `DB` resolves to the same path as before under all conditions. The explanation comment for why the autodetect does not write back to `/etc/default/adsb-graphs` now lives in one place.
 
 **Why it's an improvement:**
 
@@ -60,14 +60,14 @@ With `resolve-config.sh` as the single owner of this logic, the policy and its e
 
 ---
 
-## Issue 4 — Themes + dashboard (`graphs1090.sh`, `html/*`)
+## Issue 4 — Themes + dashboard (`adsb-graphs.sh`, `html/*`)
 
 **What changed:** The single light/dark `colorscheme` switch is replaced by six
 named themes, each rendered into its own image folder; the web UI becomes a
 dashboard (top bar, graph cards, live "Now" sidebar) with an in-page theme
 switcher.
 
-- `graphs1090.sh`: the old `colors=""`/`if dark` block is now `set_palette <theme>`
+- `adsb-graphs.sh`: the old `colors=""`/`if dark` block is now `set_palette <theme>`
   carrying full palettes for `orig-light`, `orig-dark`, `aviation`, `minimal`,
   `night`, `retro`. The option strings that embed `$colors`/`$CANVAS` moved into
   `compute_layout()` so they can be rebuilt per theme. Generation runs in a loop
@@ -84,7 +84,7 @@ switcher.
 - The page has a theme switcher and a stats sidebar. Switching theme recolors the
   chrome instantly and loads that theme's PNGs.
 - Disk/CPU cost scales with the number of enabled themes (default six ≈ 6× the
-  prior RRDtool work). Trim with `graph_themes="..."` in `/etc/default/graphs1090`.
+  prior RRDtool work). Trim with `graph_themes="..."` in `/etc/default/adsb-graphs`.
 - If `themes.json`/`stats.json` are missing (e.g. first load before a render),
   the switcher falls back to the full list and the sidebar shows placeholders —
   no console errors.

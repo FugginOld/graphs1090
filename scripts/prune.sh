@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DB=/var/lib/collectd/rrd
-source /etc/default/graphs1090
+source /etc/default/adsb-graphs
 
 if [[ -n "$1" ]]; then
     rrdfile="$1"
@@ -21,7 +21,7 @@ tmpfile="${rrdfile}.prune.rrd"
 
 prune_py=./prune-value.py
 if ! [[ -f $prune_py ]]; then
-    prune_py=/usr/share/graphs1090/prune-value.py
+    prune_py=/usr/share/adsb-graphs/prune-value.py
     if ! [[ -f $prune_py ]]; then
         echo "prune-value.py not found"
         exit 1

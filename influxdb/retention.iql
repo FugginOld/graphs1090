@@ -1,4 +1,4 @@
--- graphs1090 InfluxDB v1.x setup (migration slice).
+-- adsb-graphs InfluxDB v1.x setup (migration slice).
 -- Apply with:  influx -import -path=influxdb/retention.iql -precision=ns
 --   or:        influx < influxdb/retention.iql
 --
@@ -6,5 +6,5 @@
 -- query time via GROUP BY time($__interval). Multi-year disk-lean downsampling
 -- (continuous queries) is opt-in later via influxdb/downsample.iql.
 
-CREATE DATABASE graphs1090
-CREATE RETENTION POLICY "forever" ON graphs1090 DURATION INF REPLICATION 1 DEFAULT
+CREATE DATABASE adsb-graphs
+CREATE RETENTION POLICY "forever" ON adsb-graphs DURATION INF REPLICATION 1 DEFAULT

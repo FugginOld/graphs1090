@@ -6,7 +6,7 @@ trap "pkill -P $$ || true; exit 0" SIGTERM SIGINT SIGHUP SIGQUIT
 # make sure we're nice :)
 renice 20 $$ || true
 
-source /usr/share/graphs1090/resolve-config.sh
+source /usr/share/adsb-graphs/resolve-config.sh
 
 
 if [[ -z $DRAW_INTERVAL ]]; then
@@ -27,12 +27,12 @@ else
 fi
 
 # use zero delay for the first generation of graphs to speed it up
-/usr/share/graphs1090/boot.sh 0 &
+/usr/share/adsb-graphs/boot.sh 0 &
 wait || true;
 
 graphs() {
 	#echo "Generating $1 graphs"
-	/usr/share/graphs1090/graphs1090.sh $1 $GRAPH_DELAY &>/dev/null
+	/usr/share/adsb-graphs/adsb-graphs.sh $1 $GRAPH_DELAY &>/dev/null
 }
 
 counter=0
@@ -71,7 +71,7 @@ do
 
     if [[ $(date +%H:%M) == 00:07 ]]; then
         echo running scatter.sh
-        /usr/share/graphs1090/scatter.sh
+        /usr/share/adsb-graphs/scatter.sh
     fi
 done &
 wait || true;

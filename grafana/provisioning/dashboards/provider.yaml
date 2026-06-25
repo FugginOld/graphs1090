@@ -3,13 +3,13 @@
 apiVersion: 1
 
 providers:
-  - name: graphs1090
+  - name: adsb-graphs
     orgId: 1
-    folder: graphs1090
+    folder: adsb-graphs
     type: file
     disableDeletion: false
     updateIntervalSeconds: 30
     allowUiUpdates: true
     options:
-      path: /var/lib/grafana/dashboards/graphs1090
+      path: /var/lib/grafana/dashboards/adsb-graphs
       foldersFromFilesStructure: false

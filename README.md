@@ -1,15 +1,15 @@
-![Screenshot](https://raw.githubusercontent.com/FugginOld/graphs1090/screenshots/screenshot1.png)
-![Screenshot](https://raw.githubusercontent.com/FugginOld/graphs1090/screenshots/screenshot2.png)
+![Screenshot](https://raw.githubusercontent.com/FugginOld/adsb-graphs/screenshots/screenshot1.png)
+![Screenshot](https://raw.githubusercontent.com/FugginOld/adsb-graphs/screenshots/screenshot2.png)
 
-# graphs1090
-![Screenshot](https://raw.githubusercontent.com/FugginOld/graphs1090/screenshots/messages_24h.png)
+# adsb-graphs
+![Screenshot](https://raw.githubusercontent.com/FugginOld/adsb-graphs/screenshots/messages_24h.png)
 Graphs for readsb (wiedehopf fork) and dump1090-fa (based on dump1090-tools by mutability)
 
 Also works for other dump1090 variants supplying stats.json
 
 ## Installation / Update to current version:
 ```
-sudo bash -c "$(curl -L -o - https://github.com/FugginOld/graphs1090/raw/master/install.sh)"
+sudo bash -c "$(curl -L -o - https://github.com/FugginOld/adsb-graphs/raw/master/install.sh)"
 ```
 
 Note on data loss: When removing or losing power you will lose graph data generated after 23:42 of the previous day.
@@ -23,16 +23,16 @@ repository
 ## Configuration (optional):
 Edit the configuration file to change graph layout options, for example size:
 ```
-sudo nano /etc/default/graphs1090
+sudo nano /etc/default/adsb-graphs
 ```
 Ctrl-x to exit, y (yes) and enter to save.
 
-Checkout available options: <https://raw.githubusercontent.com/FugginOld/graphs1090/master/default>
+Checkout available options: <https://raw.githubusercontent.com/FugginOld/adsb-graphs/master/default>
 Recently added: colorscheme=dark
 
 Reset configuration to defaults:
 ```
-sudo cp /usr/share/graphs1090/default-config /etc/default/graphs1090
+sudo cp /usr/share/adsb-graphs/default-config /etc/default/adsb-graphs
 ```
 
 
@@ -43,8 +43,8 @@ a live "Now" sidebar) and a **theme switcher** offering six color schemes:
 
 | Theme            | Look                                            |
 |------------------|-------------------------------------------------|
-| `orig-light`     | Classic graphs1090 light scheme                 |
-| `orig-dark`      | Classic graphs1090 dark scheme                  |
+| `orig-light`     | Classic adsb-graphs light scheme                 |
+| `orig-dark`      | Classic adsb-graphs dark scheme                  |
 | `aviation`       | Dark phosphor-green radar / terminal aesthetic  |
 | `minimal`        | Clean light background, muted modern colors     |
 | `night`          | Dark navy dashboard, indigo accents             |
@@ -56,13 +56,13 @@ recolors instantly; the graphs themselves switch as soon as the next render of
 that theme's images is available.
 
 **How it works:** RRDtool bakes colors into each PNG at render time, so
-`graphs1090.sh` renders *every* enabled theme into its own folder
+`adsb-graphs.sh` renders *every* enabled theme into its own folder
 (`graphs/<theme>/`). The page swaps folders to switch theme — no live recolor of
 existing images is possible.
 
 **Reducing the workload:** rendering all six themes is roughly six times the
 RRDtool work per cycle. To render only the themes you actually use, set
-`graph_themes` in `/etc/default/graphs1090`:
+`graph_themes` in `/etc/default/adsb-graphs`:
 ```
 graph_themes="orig-light night"
 ```
@@ -79,7 +79,7 @@ cycle from the current RRD samples.
 
 Click the following URL and replace the IP address with the IP address of the Raspberry Pi you installed combine1090 on.
 
-http://192.168.x.yy/graphs1090
+http://192.168.x.yy/adsb-graphs
 
 or
 
@@ -113,9 +113,9 @@ For the piaware image you'll need to configure the location on the online FA sta
 If you can't make it work, give https://adsb.im a try.
 
 If you're interested in non-ADSB range, for example ADS-C or HFDL, there is an command to include
-all non-ADSB positions for the range graph but it has to be rerun after each update of graphs1090:
+all non-ADSB positions for the range graph but it has to be rerun after each update of adsb-graphs:
 ```
-sed -i -e 's/range_include_nonadsb = False/range_include_nonadsb = True/' /usr/share/graphs1090/dump1090.py
+sed -i -e 's/range_include_nonadsb = False/range_include_nonadsb = True/' /usr/share/adsb-graphs/dump1090.py
 ```
 
 ### Reducing writes to the sd-card (enabled by default)
@@ -126,7 +126,7 @@ To avoid that issue `sudo shutdown now` before unplugging the pi. See the sectio
 Reboots or shutdowns are not an issue and don't cause data loss.
 
 If you want to change how often the data is written to disk, edit `/etc/cron.d/collectd_to_disk` and replace the content with one of the following options:
-(updating / running the graphs1090 install script will overwrite this to the default)
+(updating / running the adsb-graphs install script will overwrite this to the default)
 ```
 
 # every day at 23:42
@@ -141,12 +141,12 @@ If you want to change how often the data is written to disk, edit `/etc/cron.d/c
 
 To disable this behaviour use this command:
 ```
-sudo bash /usr/share/graphs1090/git/stopMalarky.sh
+sudo bash /usr/share/adsb-graphs/git/stopMalarky.sh
 ```
 
 To re-enable the behavrious use this command:
 ```
-sudo bash /usr/share/graphs1090/git/malarky.sh
+sudo bash /usr/share/adsb-graphs/git/malarky.sh
 ```
 
 Explanation on how the above works:
@@ -194,7 +194,7 @@ Find this section:
 
 ```
 <Plugin python>
-        ModulePath "/usr/share/graphs1090"
+        ModulePath "/usr/share/adsb-graphs"
         LogTraces true
         Import "dump1090"
         <Module dump1090>
@@ -220,10 +220,10 @@ Also if you upgraded at a somewhen July 15th to July 16th 2019. Had a bad settin
 This can be necessary to change the database to save more than 3 years of data. (if the database was created before 2022-03-20)
 
 ```
-sudo bash -c "$(curl -L -o - https://github.com/FugginOld/graphs1090/raw/master/install.sh)"
+sudo bash -c "$(curl -L -o - https://github.com/FugginOld/adsb-graphs/raw/master/install.sh)"
 sudo apt update
 sudo apt install -y screen
-sudo screen /usr/share/graphs1090/new-format.sh
+sudo screen /usr/share/adsb-graphs/new-format.sh
 ```
 
 ### Reporting issues:
@@ -232,8 +232,8 @@ Please include the output for the following commands in error reports:
 ```
 sudo systemctl restart collectd
 sudo journalctl --no-pager -u collectd | tail -n40
-sudo /usr/share/graphs1090/graphs1090.sh
-sudo systemctl restart graphs1090
+sudo /usr/share/adsb-graphs/adsb-graphs.sh
+sudo systemctl restart adsb-graphs
 ```
 Paste the output into a pastebin: https://pastebin.com/
 Then include the link and be sure to also describe the issue and also mention your system (debian / ubuntu / raspbian and RPi vs x86).
@@ -260,14 +260,14 @@ sudo dpkg -i /tmp/collectd.deb
 
 ### Deinstallation:
 ```
-sudo bash /usr/share/graphs1090/uninstall.sh
+sudo bash /usr/share/adsb-graphs/uninstall.sh
 ```
 
 ### nginx configuration:
 
 Add the following line
 ```
-include /usr/share/graphs1090/nginx-graphs1090.conf;
+include /usr/share/adsb-graphs/nginx-adsb-graphs.conf;
 ```
 in the server { } section of either `/etc/nginx/sites-enabled/default` or `/etc/nginx/conf.d/default.conf` depending on your system configuration.
 
@@ -277,9 +277,9 @@ Don't forget to restart the nginx service.
 
 ```
 sudo systemctl stop collectd
-sudo /usr/share/graphs1090/gunzip.sh /var/lib/collectd/rrd/localhost
+sudo /usr/share/adsb-graphs/gunzip.sh /var/lib/collectd/rrd/localhost
 sudo rm /var/lib/collectd/rrd/localhost/dump1090-localhost/*978*
-sudo systemctl restart collectd graphs1090
+sudo systemctl restart collectd adsb-graphs
 ```
 
 ### Hiding / showing 1090 graphs
@@ -288,9 +288,9 @@ sudo systemctl restart collectd graphs1090
 
 ```
 # Hide:
-sudo sed -i -e 's/id="panel_1090" style="display:block"/id="panel_1090" style="display:none"/' /usr/share/graphs1090/html/index.html
+sudo sed -i -e 's/id="panel_1090" style="display:block"/id="panel_1090" style="display:none"/' /usr/share/adsb-graphs/html/index.html
 # Show:
-sudo sed -i -e 's/id="panel_1090" style="display:none"/id="panel_1090" style="display:block"/' /usr/share/graphs1090/html/index.html
+sudo sed -i -e 's/id="panel_1090" style="display:none"/id="panel_1090" style="display:block"/' /usr/share/adsb-graphs/html/index.html
 ```
 
 
@@ -312,7 +312,7 @@ sudo ln -s /run/dump1090-fa /usr/local/share/dump1090-data/data
 ```
 cd /var/lib/collectd/rrd
 sudo systemctl stop collectd
-sudo /usr/share/graphs1090/gunzip.sh /var/lib/collectd/rrd/localhost
+sudo /usr/share/adsb-graphs/gunzip.sh /var/lib/collectd/rrd/localhost
 sudo tar -cz -f rrd.tar.gz localhost
 cp rrd.tar.gz /tmp
 sudo systemctl restart collectd
@@ -325,7 +325,7 @@ Backup this file:
 I'm not exactly sure how you would do that on Windows.
 Probably with FileZilla using the SSH/SCP protocol.
 
-Install graphs1090 if you haven't already.
+Install adsb-graphs if you haven't already.
 
 On the new card copy the file to /tmp using FileZilla again.
 
@@ -335,19 +335,19 @@ sudo mkdir -p /var/lib/collectd/rrd/
 cd /var/lib/collectd/rrd
 sudo cp /tmp/rrd.tar.gz /var/lib/collectd/rrd/
 sudo systemctl stop collectd
-sudo /usr/share/graphs1090/gunzip.sh /var/lib/collectd/rrd/localhost
+sudo /usr/share/adsb-graphs/gunzip.sh /var/lib/collectd/rrd/localhost
 sudo tar -x -f rrd.tar.gz
-sudo systemctl restart collectd graphs1090
+sudo systemctl restart collectd adsb-graphs
 ```
 
 This should be all that is required, no guarantees though!
 
 ### Backup and Restore (moving from 32bit to 64bit, between arm64 and amd64 should be fine using the normal backup but no guarantees)
 
-Before proceeding, run the install / update script for graphs1090 on BOTH machines to get latest script versions.
+Before proceeding, run the install / update script for adsb-graphs on BOTH machines to get latest script versions.
 
 ```
-sudo /usr/share/graphs1090/rrd-dump.sh /var/lib/collectd/rrd/localhost /tmp/xml.tar.gz
+sudo /usr/share/adsb-graphs/rrd-dump.sh /var/lib/collectd/rrd/localhost /tmp/xml.tar.gz
 ```
 
 This creates XML files from the database files and places them in a designated tar.gz file which can be later restored to database files on the target system.
@@ -355,7 +355,7 @@ This creates XML files from the database files and places them in a designated t
 Copy the file xml.tar.gz to the new computer, place it in /tmp and run:
 
 ```
-sudo /usr/share/graphs1090/rrd-restore.sh /tmp/xml.tar.gz /var/lib/collectd/rrd/localhost
+sudo /usr/share/adsb-graphs/rrd-restore.sh /tmp/xml.tar.gz /var/lib/collectd/rrd/localhost
 ```
 
 Again no guarantees, but this should work.
@@ -379,7 +379,7 @@ If you want to restore one of them for whatever reason, do the following:
 cd /var/lib/collectd/rrd
 sudo systemctl stop collectd
 sudo tar --overwrite -x -f auto-backup-2021-week_42.tar.gz
-sudo systemctl restart collectd graphs1090
+sudo systemctl restart collectd adsb-graphs
 ```
 
 You'll have to choose the week you want to restore, in the above example it's 42 (file auto-backup-2021-week_42.tar.gz).
@@ -400,9 +400,9 @@ Once you have the data in /tmp/localhost, proceed as follows:
 
 ```
 sudo systemctl stop collectd
-sudo /usr/share/graphs1090/gunzip.sh /var/lib/collectd/rrd/localhost
-sudo /usr/share/graphs1090/rrd-integrate-old.sh /tmp/localhost
-sudo systemctl restart collectd graphs1090
+sudo /usr/share/adsb-graphs/gunzip.sh /var/lib/collectd/rrd/localhost
+sudo /usr/share/adsb-graphs/rrd-integrate-old.sh /tmp/localhost
+sudo systemctl restart collectd adsb-graphs
 ```
 
 If it all worked, the two datasets should be integrated now.
@@ -411,12 +411,12 @@ If it all worked, the two datasets should be integrated now.
 
 #### on the old install:
 
-- Update graphs1090 to the most recent version by running the install script
+- Update adsb-graphs to the most recent version by running the install script
 - Run the following command:
 ```
-sudo /usr/share/graphs1090/generate-adsb.im-backup.sh
+sudo /usr/share/adsb-graphs/generate-adsb.im-backup.sh
 ```
-- The backup file is available for download where the graphs are viewed by adding `/graphs1090-to-adsb.im.backup` to the URL (example: `http://192.168.1.38/graphs1090/graphs1090-to-adsb.im.backup`)
+- The backup file is available for download where the graphs are viewed by adding `/adsb-graphs-to-adsb.im.backup` to the URL (example: `http://192.168.1.38/adsb-graphs/adsb-graphs-to-adsb.im.backup`)
 
 #### on the adsb.im install:
 
@@ -456,12 +456,12 @@ sudo systemctl restart collectd
 sudo systemctl stop collectd
 sudo rm /var/lib/collectd/rrd/localhost* -rf
 sudo rm -f /var/lib/collectd/rrd/auto-backup-$(date +%Y-week_%V).tar.gz
-sudo systemctl restart collectd graphs1090
+sudo systemctl restart collectd adsb-graphs
 ```
 
 ### Change the timezone used in the graphs
 
-Either change the global system timezone or add this to /etc/default/graphs1090 using the correct timezone:
+Either change the global system timezone or add this to /etc/default/adsb-graphs using the correct timezone:
 ```
 export TZ=Europe/Berlin
 ```

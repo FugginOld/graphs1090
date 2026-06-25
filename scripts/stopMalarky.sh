@@ -5,22 +5,22 @@ rm -f /etc/systemd/system/collectd.service
 rm -f /etc/systemd/system/collectd.service.d/malarky.conf
 sed -i -e 's?DataDir.*?DataDir "/var/lib/collectd/rrd/"?' /etc/collectd/collectd.conf
 
-if ! grep -qs -e '^DB=' /etc/default/graphs1090; then
-    echo "DB=" >>/etc/default/graphs1090
+if ! grep -qs -e '^DB=' /etc/default/adsb-graphs; then
+    echo "DB=" >>/etc/default/adsb-graphs
 fi
 
-sed -i -e 's#^DB=.*#DB=/var/lib/collectd/rrd#' /etc/default/graphs1090
+sed -i -e 's#^DB=.*#DB=/var/lib/collectd/rrd#' /etc/default/adsb-graphs
 
 systemctl daemon-reload
 
-/usr/share/graphs1090/gunzip.sh /var/lib/collectd/rrd/localhost
+/usr/share/adsb-graphs/gunzip.sh /var/lib/collectd/rrd/localhost
 
 systemctl restart collectd
-systemctl restart graphs1090
+systemctl restart adsb-graphs
 
 rm -f /etc/cron.d/collectd_to_disk
 
-touch /usr/share/graphs1090/noMalarky
+touch /usr/share/adsb-graphs/noMalarky
 
 echo ---------
 echo write reducing measures disabled!

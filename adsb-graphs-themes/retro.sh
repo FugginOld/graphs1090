@@ -1,5 +1,5 @@
 #!/bin/bash
-# graphs1090 Theme: Retro
+# adsb-graphs Theme: Retro
 # Modernized version of the original dark green style —
 # same green fill + cyan ADS-B line, cleaner execution
 # ------------------------------------------------

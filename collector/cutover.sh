@@ -1,11 +1,11 @@
 #!/bin/bash
-# graphs1090 Phase C cutover — expose Grafana via the existing web server.
+# adsb-graphs Phase C cutover — expose Grafana via the existing web server.
 #
 # What this does (non-destructive):
 #   1. Reconfigures Grafana to serve from /grafana/ sub-path.
 #   2. Installs a lighttpd or nginx proxy conf.
 #   3. Reloads the web server.
-#   4. Keeps the old /graphs1090/ PNGs serving unchanged as a fallback.
+#   4. Keeps the old /adsb-graphs/ PNGs serving unchanged as a fallback.
 #
 # Usage:  sudo bash collector/cutover.sh
 #
@@ -13,7 +13,7 @@
 #   http://<host>/grafana/         (via web server proxy)
 #   http://<host>:3000/            (direct, still works)
 #
-# Old PNGs stay at:  http://<host>/graphs1090/
+# Old PNGs stay at:  http://<host>/adsb-graphs/
 
 set -e
 trap 'echo "[ERROR] line $LINENO: $BASH_COMMAND"' ERR
@@ -33,7 +33,7 @@ if [ -z "$webserver" ]; then
     echo "No running lighttpd or nginx detected."
     echo "Install the proxy conf manually:"
     echo "  lighttpd: config/http/90-grafana-proxy.conf"
-    echo "  nginx:    config/http/nginx-graphs1090.conf (grafana block)"
+    echo "  nginx:    config/http/nginx-adsb-graphs.conf (grafana block)"
     echo "Then set GF_SERVER_ROOT_URL and GF_SERVER_SERVE_FROM_SUB_PATH in"
     echo "  /etc/grafana/grafana.ini or /etc/default/grafana-server"
     exit 0
@@ -93,9 +93,9 @@ elif [ "$webserver" = nginx ]; then
     # The nginx conf file ships combined (legacy + grafana blocks).
     # If the user already has the legacy conf in place, patch it in-place.
     target=""
-    for candidate in /etc/nginx/conf.d/graphs1090.conf \
-                     /etc/nginx/sites-enabled/graphs1090 \
-                     /etc/nginx/sites-available/graphs1090; do
+    for candidate in /etc/nginx/conf.d/adsb-graphs.conf \
+                     /etc/nginx/sites-enabled/adsb-graphs \
+                     /etc/nginx/sites-available/adsb-graphs; do
         [ -f "$candidate" ] && target="$candidate" && break
     done
 
@@ -103,7 +103,7 @@ elif [ "$webserver" = nginx ]; then
         if ! grep -q '/grafana/' "$target"; then
             cat >> "$target" <<'NGINXBLOCK'
 
-# graphs1090 Grafana reverse proxy (Phase C cutover)
+# adsb-graphs Grafana reverse proxy (Phase C cutover)
 location /grafana/ {
   proxy_pass         http://127.0.0.1:3000/grafana/;
   proxy_http_version 1.1;
@@ -121,9 +121,9 @@ NGINXBLOCK
             echo "  -> $target already has /grafana/ block; skipping"
         fi
     else
-        echo "  -> no existing graphs1090 nginx conf found; installing new file"
-        install -m 0644 "$here/config/http/nginx-graphs1090.conf" \
-            /etc/nginx/conf.d/graphs1090.conf
+        echo "  -> no existing adsb-graphs nginx conf found; installing new file"
+        install -m 0644 "$here/config/http/nginx-adsb-graphs.conf" \
+            /etc/nginx/conf.d/adsb-graphs.conf
     fi
 
     nginx -t && systemctl reload nginx
@@ -137,7 +137,7 @@ echo
 echo "== Phase C done =="
 echo "Grafana (via proxy):  http://${ip}/grafana/"
 echo "Grafana (direct):     http://${ip}:3000/"
-echo "Old PNGs (unchanged): http://${ip}/graphs1090/"
+echo "Old PNGs (unchanged): http://${ip}/adsb-graphs/"
 echo
 echo "Verify panels show live data, then run:"
 echo "  sudo bash collector/decommission.sh"

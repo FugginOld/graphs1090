@@ -1,12 +1,12 @@
 
 [Unit]
-Description=graphs1090 graph generation
+Description=adsb-graphs graph generation
 After=collectd.service
 
 [Service]
-ExecStart=/usr/share/graphs1090/service-graphs1090.sh
-SyslogIdentifier=graphs1090
-RuntimeDirectory=graphs1090
+ExecStart=/usr/share/adsb-graphs/service-adsb-graphs.sh
+SyslogIdentifier=adsb-graphs
+RuntimeDirectory=adsb-graphs
 RuntimeDirectoryMode=0755
 Type=simple
 Restart=always

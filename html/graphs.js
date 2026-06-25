@@ -82,7 +82,7 @@ let theme = DEFAULT_THEME;
 let graphDir = 'graphs/' + theme + '/';
 
 try {
-    const stored = localStorage.getItem('graphs1090_theme');
+    const stored = localStorage.getItem('adsb-graphs_theme');
     if (stored) theme = stored;
 } catch (e) {}
 if (usp.get('theme')) theme = usp.get('theme');
@@ -95,7 +95,7 @@ function applyChrome() {
 
 function setTheme(newTheme) {
     if (newTheme) theme = newTheme;
-    try { localStorage.setItem('graphs1090_theme', theme); } catch (e) {}
+    try { localStorage.setItem('adsb-graphs_theme', theme); } catch (e) {}
     applyChrome();
     switchView();   // reloads every image from graphs/<theme>/
 }

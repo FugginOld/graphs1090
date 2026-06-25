@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>graphs1090 — Dashboard Mockup</title>
+<title>adsb-graphs — Dashboard Mockup</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -198,7 +198,7 @@
 <nav class="topnav">
   <span class="logo">▣</span>
   <div class="breadcrumb">
-    <span>graphs1090</span>
+    <span>adsb-graphs</span>
     <span>›</span>
     <span class="current" id="nav-title">ADS-B</span>
   </div>
@@ -216,7 +216,7 @@
 
 <!-- ═══════════════════════════════════════════════════════════ TOOLBAR -->
 <div class="toolbar">
-  <span class="title" id="dash-title">graphs1090 — ADS-B</span>
+  <span class="title" id="dash-title">adsb-graphs — ADS-B</span>
   <div class="btn">📅 Last 24 hours <span class="caret">▾</span></div>
   <div class="btn">🔄 Auto <span class="caret">▾</span></div>
   <div class="btn">instance: localhost <span class="caret">▾</span></div>
@@ -958,7 +958,7 @@
     document.getElementById('dash-system').style.display = id === 'system' ? '' : 'none';
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     tabEl.classList.add('active');
-    const titles = { adsb: 'graphs1090 — ADS-B', system: 'System' };
+    const titles = { adsb: 'adsb-graphs — ADS-B', system: 'System' };
     document.getElementById('dash-title').textContent = titles[id];
     document.getElementById('nav-title').textContent  = titles[id];
   }

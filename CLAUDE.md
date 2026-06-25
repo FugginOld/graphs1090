@@ -2,7 +2,7 @@
 
 ### Issue tracker
 
-Issues are tracked on GitHub (`FugginOld/graphs1090`); external PRs are not a triage surface. See `docs/agents/issue-tracker.md`.
+Issues are tracked on GitHub (`FugginOld/adsb-graphs`); external PRs are not a triage surface. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
