@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>graphs1090 — Dashboard Mockup</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #111217;
+    color: #d0d0d0;
+    font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+    font-size: 13px;
+    min-height: 100vh;
+  }
+
+  /* ── Top nav ─────────────────────────────────────────────── */
+  .topnav {
+    background: #181b1f;
+    border-bottom: 1px solid #2c2f35;
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 12px;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topnav .logo { color: #f05a28; font-size: 22px; line-height: 1; }
+  .topnav .breadcrumb { display: flex; align-items: center; gap: 6px; color: #aaa; }
+  .topnav .breadcrumb .current { color: #e0e0e0; font-weight: 500; }
+  .topnav .spacer { flex: 1; }
+  .topnav .nav-icon {
+    color: #888;
+    font-size: 16px;
+    padding: 4px 6px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .topnav .nav-icon:hover { background: #2c2f35; color: #d0d0d0; }
+
+  /* ── Dashboard tab bar ───────────────────────────────────── */
+  .tabbar {
+    background: #181b1f;
+    border-bottom: 1px solid #2c2f35;
+    display: flex;
+    padding: 0 16px;
+    gap: 2px;
+  }
+  .tab {
+    padding: 8px 16px;
+    color: #888;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    font-size: 13px;
+  }
+  .tab.active { color: #f05a28; border-bottom-color: #f05a28; }
+  .tab:hover:not(.active) { color: #ccc; }
+
+  /* ── Toolbar ─────────────────────────────────────────────── */
+  .toolbar {
+    background: #1a1d23;
+    border-bottom: 1px solid #2c2f35;
+    display: flex;
+    align-items: center;
+    padding: 6px 16px;
+    gap: 8px;
+  }
+  .toolbar .title { font-size: 16px; font-weight: 600; color: #e8e8e8; flex: 1; }
+  .btn {
+    background: #2c2f35;
+    border: 1px solid #3a3d44;
+    border-radius: 3px;
+    color: #ccc;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+  }
+  .btn:hover { background: #383b42; }
+  .btn .caret { opacity: 0.6; font-size: 10px; }
+  .btn.primary { background: #1f60c4; border-color: #1f60c4; color: #fff; }
+  .btn.primary:hover { background: #2a72db; }
+
+  /* ── Dashboard canvas ────────────────────────────────────── */
+  .dashboard {
+    padding: 8px 8px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Two-column row */
+  .panel-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .panel-row.full { grid-template-columns: 1fr; }
+
+  /* ── Panel ───────────────────────────────────────────────── */
+  .panel {
+    background: #181b1f;
+    border: 1px solid #2c2f35;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    min-height: 220px;
+  }
+  .panel-header {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px 4px;
+    border-bottom: 1px solid #2c2f35;
+    gap: 6px;
+  }
+  .panel-title { font-size: 13px; font-weight: 600; color: #d8d8d8; flex: 1; }
+  .panel-menu { color: #555; font-size: 14px; cursor: pointer; }
+  .panel-menu:hover { color: #aaa; }
+  .panel-body { flex: 1; padding: 8px 4px 4px; display: flex; flex-direction: column; }
+
+  /* ── Collapsible row header ──────────────────────────────── */
+  .row-header {
+    background: #1f222a;
+    border: 1px solid #2c2f35;
+    border-radius: 4px;
+    padding: 7px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: #bbb;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .row-header .caret { transition: transform 0.2s; }
+  .row-header.open .caret { transform: rotate(90deg); }
+  .row-header .row-title { flex: 1; }
+  .row-content { display: flex; flex-direction: column; gap: 8px; }
+
+  /* ── SVG chart defaults ──────────────────────────────────── */
+  svg { display: block; }
+  .axis-label { font-size: 10px; fill: #666; }
+  .axis-line { stroke: #2c2f35; stroke-width: 1; }
+  .grid-line { stroke: #222630; stroke-width: 1; }
+  .chart-bg { fill: none; }
+
+  /* ── Legend table ────────────────────────────────────────── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    padding: 6px 10px 4px;
+    border-top: 1px solid #222;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #aaa;
+  }
+  .legend-swatch {
+    width: 12px;
+    height: 3px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .legend-item .val { color: #ccc; font-weight: 500; margin-left: 2px; }
+
+  /* ── Color palette ───────────────────────────────────────── */
+  :root {
+    --c0: #7eb26d; /* green */
+    --c1: #eab839; /* yellow */
+    --c2: #6ed0e0; /* cyan */
+    --c3: #ef843c; /* orange */
+    --c4: #e24d42; /* red */
+    --c5: #1f78c1; /* blue */
+    --c6: #ba43a9; /* purple */
+    --c7: #705da0; /* violet */
+  }
+
+  /* ── Section label ───────────────────────────────────────── */
+  .section-label {
+    padding: 12px 4px 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ TOP NAV -->
+<nav class="topnav">
+  <span class="logo">▣</span>
+  <div class="breadcrumb">
+    <span>graphs1090</span>
+    <span>›</span>
+    <span class="current" id="nav-title">ADS-B</span>
+  </div>
+  <div class="spacer"></div>
+  <span class="nav-icon" title="Share">⎘</span>
+  <span class="nav-icon" title="Settings">⚙</span>
+  <span class="nav-icon" title="Star">☆</span>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════ TAB BAR -->
+<div class="tabbar">
+  <div class="tab active" onclick="showDash('adsb',this)">ADS-B</div>
+  <div class="tab" onclick="showDash('system',this)">System</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ TOOLBAR -->
+<div class="toolbar">
+  <span class="title" id="dash-title">graphs1090 — ADS-B</span>
+  <div class="btn">📅 Last 24 hours <span class="caret">▾</span></div>
+  <div class="btn">🔄 Auto <span class="caret">▾</span></div>
+  <div class="btn">instance: localhost <span class="caret">▾</span></div>
+  <div class="btn primary">⏵ Refresh</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ ADS-B DASHBOARD -->
+<div id="dash-adsb" class="dashboard">
+
+  <!-- Row 1: Aircraft Seen | Message Rate -->
+  <div class="panel-row">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Aircraft Seen</span>
+        <span class="panel-menu">⋯</span>
+      </div>
+      <div class="panel-body">
+        <svg viewBox="0 0 460 130" width="100%" height="130">
+          <defs>
+            <linearGradient id="g0" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7eb26d" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#7eb26d" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#eab839" stop-opacity="0.30"/>
+              <stop offset="100%" stop-color="#eab839" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#6ed0e0" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#6ed0e0" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <!-- Grid -->
+          <line x1="40" y1="10" x2="455" y2="10" class="grid-line"/>
+          <line x1="40" y1="40" x2="455" y2="40" class="grid-line"/>
+          <line x1="40" y1="70" x2="455" y2="70" class="grid-line"/>
+          <line x1="40" y1="100" x2="455" y2="100" class="grid-line"/>
+          <!-- Y labels -->
+          <text x="35" y="13" class="axis-label" text-anchor="end">60</text>
+          <text x="35" y="43" class="axis-label" text-anchor="end">45</text>
+          <text x="35" y="73" class="axis-label" text-anchor="end">30</text>
+          <text x="35" y="103" class="axis-label" text-anchor="end">15</text>
+          <!-- total fill + line -->
+          <path d="M40,80 C60,75 80,60 110,55 C140,50 160,42 190,38 C220,34 240,30 270,25 C300,20 320,22 350,28 C380,33 410,36 440,32 L440,120 L40,120 Z" fill="url(#g0)"/>
+          <path d="M40,80 C60,75 80,60 110,55 C140,50 160,42 190,38 C220,34 240,30 270,25 C300,20 320,22 350,28 C380,33 410,36 440,32" fill="none" stroke="#7eb26d" stroke-width="1.5"/>
+          <!-- with_pos fill + line -->
+          <path d="M40,90 C60,86 80,74 110,70 C140,66 160,60 190,55 C220,50 240,46 270,42 C300,37 320,38 350,44 C380,49 410,51 440,47 L440,120 L40,120 Z" fill="url(#g1)"/>
+          <path d="M40,90 C60,86 80,74 110,70 C140,66 160,60 190,55 C220,50 240,46 270,42 C300,37 320,38 350,44 C380,49 410,51 440,47" fill="none" stroke="#eab839" stroke-width="1.5"/>
+          <!-- mlat fill + line -->
+          <path d="M40,108 C60,107 80,105 110,106 C140,107 160,104 190,103 C220,102 240,101 270,100 C300,99 320,100 350,102 C380,104 410,103 440,102 L440,120 L40,120 Z" fill="url(#g2)"/>
+          <path d="M40,108 C60,107 80,105 110,106 C140,107 160,104 190,103 C220,102 240,101 270,100 C300,99 320,100 350,102 C380,104 410,103 440,102" fill="none" stroke="#6ed0e0" stroke-width="1.5"/>
+          <!-- X axis -->
+          <line x1="40" y1="120" x2="455" y2="120" class="axis-line"/>
+          <text x="40"  y="130" class="axis-label" text-anchor="middle">00:00</text>
+          <text x="165" y="130" class="axis-label" text-anchor="middle">06:00</text>
+          <text x="290" y="130" class="axis-label" text-anchor="middle">12:00</text>
+          <text x="415" y="130" class="axis-label" text-anchor="middle">18:00</text>
+        </svg>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#7eb26d"></span>total<span class="val">42</span><span style="color:#555;font-size:10px">max:58</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#eab839"></span>with positions<span class="val">30</span><span style="color:#555;font-size:10px">max:44</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#6ed0e0"></span>mlat<span class="val">2</span><span style="color:#555;font-size:10px">max:5</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Message Rate</span>
+        <span class="panel-menu">⋯</span>
+      </div>
+      <div class="panel-body">
+        <svg viewBox="0 0 460 130" width="100%" height="130">
+          <defs>
+            <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7eb26d" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#7eb26d" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="g4" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#eab839" stop-opacity="0.30"/>
+              <stop offset="100%" stop-color="#eab839" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <line x1="40" y1="10" x2="455" y2="10" class="grid-line"/>
+          <line x1="40" y1="40" x2="455" y2="40" class="grid-line"/>
+          <line x1="40" y1="70" x2="455" y2="70" class="grid-line"/>
+          <line x1="40" y1="100" x2="455" y2="100" class="grid-line"/>
+          <text x="35" y="13" class="axis-label" text-anchor="end">2k</text>
+          <text x="35" y="43" class="axis-label" text-anchor="end">1.5k</text>
+          <text x="35" y="73" class="axis-label" text-anchor="end">1k</text>
+          <text x="35" y="103" class="axis-label" text-anchor="end">500</text>
+          <!-- local_accepted -->
+          <path d="M40,85 C70,80 100,65 130,58 C160,51 180,44 210,40 C240,36 260,33 290,30 C320,27 350,29 380,35 C410,41 430,38 455,36 L455,120 L40,120 Z" fill="url(#g3)"/>
+          <path d="M40,85 C70,80 100,65 130,58 C160,51 180,44 210,40 C240,36 260,33 290,30 C320,27 350,29 380,35 C410,41 430,38 455,36" fill="none" stroke="#7eb26d" stroke-width="1.5"/>
+          <!-- positions -->
+          <path d="M40,100 C70,98 100,90 130,87 C160,84 180,79 210,76 C240,73 260,71 290,68 C320,65 350,66 380,71 C410,76 430,73 455,71 L455,120 L40,120 Z" fill="url(#g4)"/>
+          <path d="M40,100 C70,98 100,90 130,87 C160,84 180,79 210,76 C240,73 260,71 290,68 C320,65 350,66 380,71 C410,76 430,73 455,71" fill="none" stroke="#eab839" stroke-width="1.5"/>
+          <line x1="40" y1="120" x2="455" y2="120" class="axis-line"/>
+          <text x="40"  y="130" class="axis-label" text-anchor="middle">00:00</text>
+          <text x="165" y="130" class="axis-label" text-anchor="middle">06:00</text>
+          <text x="290" y="130" class="axis-label" text-anchor="middle">12:00</text>
+          <text x="415" y="130" class="axis-label" text-anchor="middle">18:00</text>
+        </svg>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#7eb26d"></span>local_accepted<span class="val">1,247/s</span><span style="color:#555;font-size:10px">max:1,580/s</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#eab839"></span>positions<span class="val">412/s</span><span style="color:#555;font-size:10px">max:520/s</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Range | Signal -->
+  <div class="panel-row">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Range</span>
+        <span class="panel-menu">⋯</span>
+      </div>
+      <div class="panel-body">
+        <svg viewBox="0 0 460 130" width="100%" height="130">
+          <defs>
+            <linearGradient id="g5" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7eb26d" stop-opacity="0.30"/>
+              <stop offset="100%" stop-color="#7eb26d" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="g6" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#eab839" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#eab839" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <line x1="40" y1="10" x2="455" y2="10" class="grid-line"/>
+          <line x1="40" y1="40" x2="455" y2="40" class="grid-line"/>
+          <line x1="40" y1="70" x2="455" y2="70" class="grid-line"/>
+          <line x1="40" y1="100" x2="455" y2="100" class="grid-line"/>
+          <text x="35" y="13" class="axis-label" text-anchor="end">400NM</text>
+          <text x="35" y="43" class="axis-label" text-anchor="end">300</text>
+          <text x="35" y="73" class="axis-label" text-anchor="end">200</text>
+          <text x="35" y="103" class="axis-label" text-anchor="end">100</text>
+          <!-- max_range -->
+          <path d="M40,30 C80,25 120,20 160,18 C200,16 240,14 280,16 C320,18 360,22 400,26 C430,29 445,27 455,25 L455,120 L40,120 Z" fill="url(#g5)"/>
+          <path d="M40,30 C80,25 120,20 160,18 C200,16 240,14 280,16 C320,18 360,22 400,26 C430,29 445,27 455,25" fill="none" stroke="#7eb26d" stroke-width="1.5"/>
+          <!-- median -->
+          <path d="M40,65 C80,62 120,58 160,55 C200,52 240,50 280,52 C320,54 360,57 400,60 C430,62 445,61 455,60 L455,120 L40,120 Z" fill="url(#g6)"/>
+          <path d="M40,65 C80,62 120,58 160,55 C200,52 240,50 280,52 C320,54 360,57 400,60 C430,62 445,61 455,60" fill="none" stroke="#eab839" stroke-width="1.5"/>
+          <!-- q1 dashed -->
+          <path d="M40,86 C80,84 120,82 160,80 C200,78 240,77 280,79 C320,81 360,83 400,85 C430,86 445,86 455,85" fill="none" stroke="#6ed0e0" stroke-width="1" stroke-dasharray="4,3"/>
+          <!-- q3 dashed -->
+          <path d="M40,47 C80,45 120,43 160,41 C200,39 240,38 280,40 C320,42 360,45 400,48 C430,50 445,49 455,48" fill="none" stroke="#6ed0e0" stroke-width="1" stroke-dasharray="4,3"/>
+          <line x1="40" y1="120" x2="455" y2="120" class="axis-line"/>
+          <text x="40"  y="130" class="axis-label" text-anchor="middle">00:00</text>
+          <text x="165" y="130" class="axis-label" text-anchor="middle">06:00</text>
+          <text x="290" y="130" class="axis-label" text-anchor="middle">12:00</text>
+          <text x="415" y="130" class="axis-label" text-anchor="middle">18:00</text>
+        </svg>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#7eb26d"></span>max_range<span class="val">345 NM</span><span style="color:#555;font-size:10px">max:368NM</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#eab839"></span>median<span class="val">210 NM</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#6ed0e0;height:1px;border-top:1px dashed #6ed0e0"></span>q1 / q3<span class="val">98 / 288 NM</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Signal</span>
+        <span class="panel-menu">⋯</span>
+      </div>
+      <div class="panel-body">
+        <svg viewBox="0 0 460 130" width="100%" height="130">
+          <defs>
+            <linearGradient id="g7" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7eb26d" stop-opacity="0.30"/>
+              <stop offset="100%" stop-color="#7eb26d" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="g8" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#e24d42" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#e24d42" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <line x1="40" y1="10" x2="455" y2="10" class="grid-line"/>
+          <line x1="40" y1="40" x2="455" y2="40" class="grid-line"/>
+          <line x1="40" y1="70" x2="455" y2="70" class="grid-line"/>
+          <line x1="40" y1="100" x2="455" y2="100" class="grid-line"/>
+          <text x="35" y="13" class="axis-label" text-anchor="end">-5</text>
+          <text x="35" y="43" class="axis-label" text-anchor="end">-15</text>
+          <text x="35" y="73" class="axis-label" text-anchor="end">-25</text>
+          <text x="35" y="103" class="axis-label" text-anchor="end">-35dBFS</text>
+          <!-- median signal -->
+          <path d="M40,58 C80,55 120,54 160,52 C200,50 240,48 280,50 C320,52 360,55 400,53 C430,51 445,52 455,51 L455,120 L40,120 Z" fill="url(#g7)"/>
+          <path d="M40,58 C80,55 120,54 160,52 C200,50 240,48 280,50 C320,52 360,55 400,53 C430,51 445,52 455,51" fill="none" stroke="#7eb26d" stroke-width="1.5"/>
+          <!-- noise floor -->
+          <path d="M40,90 C80,91 120,89 160,90 C200,91 240,90 280,91 C320,92 360,90 400,91 C430,91 445,90 455,91 L455,120 L40,120 Z" fill="url(#g8)"/>
+          <path d="M40,90 C80,91 120,89 160,90 C200,91 240,90 280,91 C320,92 360,90 400,91 C430,91 445,90 455,91" fill="none" stroke="#e24d42" stroke-width="1.5"/>
+          <!-- peak_signal dashed -->
+          <path d="M40,18 C80,15 120,13 160,12 C200,11 240,10 280,11 C320,12 360,14 400,15 C430,16 445,15 455,14" fill="none" stroke="#eab839" stroke-width="1" stroke-dasharray="4,3"/>
+          <line x1="40" y1="120" x2="455" y2="120" class="axis-line"/>
+          <text x="40"  y="130" class="axis-label" text-anchor="middle">00:00</text>
+          <text x="165" y="130" class="axis-label" text-anchor="middle">06:00</text>
+          <text x="290" y="130" class="axis-label" text-anchor="middle">12:00</text>
+          <text x="415" y="130" class="axis-label" text-anchor="middle">18:00</text>
+        </svg>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#7eb26d"></span>median<span class="val">−18.2 dBFS</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#e24d42"></span>noise<span class="val">−30.1 dBFS</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#eab839"></span>peak<span class="val">−3.1 dBFS</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3: Tracks | CPU -->
+  <div class="panel-row">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Tracks</span>
+        <span class="panel-menu">⋯</span>
+      </div>
+      <div class="panel-body">
+        <svg viewBox="0 0 460 130" width="100%" height="130">
+          <defs>
+            <linearGradient id="g9" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7eb26d" stop-opacity="0.30"/>
+              <stop offset="100%" stop-color="#7eb26d" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="g10" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#eab839" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#eab839" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <line x1="40" y1="10" x2="455" y2="10" class="grid-line"/>
+          <line x1="40" y1="40" x2="455" y2="40" class="grid-line"/>
+          <line x1="40" y1="70" x2="455" y2="70" class="grid-line"/>
+          <line x1="40" y1="100" x2="455" y2="100" class="grid-line"/>
+          <text x="35" y="13" class="axis-label" text-anchor="end">100</text>
+          <text x="35" y="43" class="axis-label" text-anchor="end">75</text>
+          <text x="35" y="73" class="axis-label" text-anchor="end">50</text>
+          <text x="35" y="103" class="axis-label" text-anchor="end">25</text>
+          <path d="M40,60 C80,55 120,48 160,44 C200,40 240,38 280,36 C320,34 360,36 400,40 C430,43 445,41 455,40 L455,120 L40,120 Z" fill="url(#g9)"/>
+          <path d="M40,60 C80,55 120,48 160,44 C200,40 240,38 280,36 C320,34 360,36 400,40 C430,43 445,41 455,40" fill="none" stroke="#7eb26d" stroke-width="1.5"/>
+          <path d="M40,98 C80,97 120,96 160,95 C200,94 240,94 280,95 C320,96 360,96 400,97 C430,97 445,97 455,96 L455,120 L40,120 Z" fill="url(#g10)"/>
+          <path d="M40,98 C80,97 120,96 160,95 C200,94 240,94 280,95 C320,96 360,96 400,97 C430,97 445,97 455,96" fill="none" stroke="#eab839" stroke-width="1.5"/>
+          <line x1="40" y1="120" x2="455" y2="120" class="axis-line"/>
+          <text x="40"  y="130" class="axis-label" text-anchor="middle">00:00</text>
+          <text x="165" y="130" class="axis-label" text-anchor="middle">06:00</text>
+          <text x="290" y="130" class="axis-label" text-anchor="middle">12:00</text>
+          <text x="415" y="130" class="axis-label" text-anchor="middle">18:00</text>
+        </svg>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#7eb26d"></span>all<span class="val">67</span><span style="color:#555;font-size:10px">max:92</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#eab839"></span>single_message<span class="val">14</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">CPU (decoder threads)</span>
+        <span class="panel-menu">⋯</span>
+      </div>
+      <div class="panel-body">
+        <svg viewBox="0 0 460 130" width="100%" height="130">
+          <defs>
+            <linearGradient id="g11" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7eb26d" stop-opacity="0.30"/>
+              <stop offset="100%" stop-color="#7eb26d" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="g12" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#eab839" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#eab839" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="g13" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#6ed0e0" stop-opacity="0.20"/>
+              <stop offset="100%" stop-color="#6ed0e0" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <line x1="40" y1="10" x2="455" y2="10" class="grid-line"/>
+          <line x1="40" y1="40" x2="455" y2="40" class="grid-line"/>
+          <line x1="40" y1="70" x2="455" y2="70" class="grid-line"/>
+          <line x1="40" y1="100" x2="455" y2="100" class="grid-line"/>
+          <text x="35" y="13" class="axis-label" text-anchor="end">30ms</text>
+          <text x="35" y="43" class="axis-label" text-anchor="end">20ms</text>
+          <text x="35" y="73" class="axis-label" text-anchor="end">10ms</text>
+          <text x="35" y="103" class="axis-label" text-anchor="end">5ms</text>
+          <!-- demod -->
+          <path d="M40,50 C80,48 120,46 160,44 C200,42 240,40 280,42 C320,44 360,47 400,45 C430,44 445,43 455,43 L455,120 L40,120 Z" fill="url(#g11)"/>
+          <path d="M40,50 C80,48 120,46 160,44 C200,42 240,40 280,42 C320,44 360,47 400,45 C430,44 445,43 455,43" fill="none" stroke="#7eb26d" stroke-width="1.5"/>
+          <!-- reader -->
+          <path d="M40,88 C80,87 120,86 160,85 C200,85 240,84 280,85 C320,86 360,87 400,86 C430,86 445,86 455,86 L455,120 L40,120 Z" fill="url(#g12)"/>
+          <path d="M40,88 C80,87 120,86 160,85 C200,85 240,84 280,85 C320,86 360,87 400,86 C430,86 445,86 455,86" fill="none" stroke="#eab839" stroke-width="1.5"/>
+          <!-- background -->
+          <path d="M40,108 C80,108 120,107 160,108 C200,108 240,107 280,108 C320,108 360,108 400,108 C430,108 445,108 455,108 L455,120 L40,120 Z" fill="url(#g13)"/>
+          <path d="M40,108 C80,108 120,107 160,108 C200,108 240,107 280,108 C320,108 360,108 400,108 C430,108 445,108 455,108" fill="none" stroke="#6ed0e0" stroke-width="1.5"/>
+          <line x1="40" y1="120" x2="455" y2="120" class="axis-line"/>
+          <text x="40"  y="130" class="axis-label" text-anchor="middle">00:00</text>
+          <text x="165" y="130" class="axis-label" text-anchor="middle">06:00</text>
+          <text x="290" y="130" class="axis-label" text-anchor="middle">12:00</text>
+          <text x="415" y="130" class="axis-label" text-anchor="middle">18:00</text>
+        </svg>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#7eb26d"></span>demod<span class="val">12 ms</span><span style="color:#555;font-size:10px">max:18ms</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#eab839"></span>reader<span class="val">2 ms</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#6ed0e0"></span>background<span class="val">0.4 ms</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 4: Gain (full width) -->
+  <div class="panel-row full">
+    <div class="panel" style="min-height:140px">
+      <div class="panel-header">
+        <span class="panel-title">Gain</span>
+        <span class="panel-menu">⋯</span>
+      </div>
+      <div class="panel-body">
+        <svg viewBox="0 0 940 90" width="100%" height="90">
+          <line x1="40" y1="10" x2="935" y2="10" class="grid-line"/>
+          <line x1="40" y1="35" x2="935" y2="35" class="grid-line"/>
+          <line x1="40" y1="60" x2="935" y2="60" class="grid-line"/>
+          <text x="35" y="13" class="axis-label" text-anchor="end">50</text>
+          <text x="35" y="38" class="axis-label" text-anchor="end">49.6</text>
+          <text x="35" y="63" class="axis-label" text-anchor="end">49</text>
+          <defs>
+            <linearGradient id="g14" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7eb26d" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#7eb26d" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <path d="M40,34 L200,34 L200,50 L280,50 L280,34 L600,34 L600,20 L720,20 L720,34 L935,34 L935,75 L40,75 Z" fill="url(#g14)"/>
+          <path d="M40,34 L200,34 L200,50 L280,50 L280,34 L600,34 L600,20 L720,20 L720,34 L935,34" fill="none" stroke="#7eb26d" stroke-width="1.5"/>
+          <line x1="40" y1="75" x2="935" y2="75" class="axis-line"/>
+          <text x="40"  y="85" class="axis-label" text-anchor="middle">00:00</text>
+          <text x="245" y="85" class="axis-label" text-anchor="middle">06:00</text>
+          <text x="490" y="85" class="axis-label" text-anchor="middle">12:00</text>
+          <text x="735" y="85" class="axis-label" text-anchor="middle">18:00</text>
+          <text x="930" y="85" class="axis-label" text-anchor="end">24:00</text>
+        </svg>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#7eb26d"></span>gain_db<span class="val">49.6 dB</span><span style="color:#555;font-size:10px">last</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Collapsible 978 row -->
+  <div class="row-header open" onclick="toggle978(this)">
+    <span class="caret">▶</span>
+    <span class="row-title">978 MHz (UAT)</span>
+    <span style="color:#555;font-size:11px">2 panels</span>
+  </div>
+  <div class="row-content" id="row-978">
+    <div class="panel-row">
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">978 Aircraft Seen</span>
+          <span class="panel-menu">⋯</span>
+        </div>
+        <div class="panel-body">
+          <svg viewBox="0 0 460 130" width="100%" height="130">
+            <defs>
+              <linearGradient id="g15" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#7eb26d" stop-opacity="0.30"/>
+                <stop offset="100%" stop-color="#7eb26d" stop-opacity="0.02"/>
+              </linearGradient>
+              <linearGradient id="g16" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#eab839" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="#eab839" stop-opacity="0.02"/>
+              </linearGradient>
+            </defs>
+            <line x1="40" y1="10" x2="455" y2="10" class="grid-line"/>
+            <line x1="40" y1="40" x2="455" y2="40" class="grid-line"/>
+            <line x1="40" y1="70" x2="455" y2="70" class="grid-line"/>
+            <line x1="40" y1="100" x2="455" y2="100" class="grid-line"/>
+            <text x="35" y="13" class="axis-label" text-anchor="end">12</text>
+            <text x="35" y="43" class="axis-label" text-anchor="end">9</text>
+            <text x="35" y="73" class="axis-label" text-anchor="end">6</text>
+            <text x="35" y="103" class="axis-label" text-anchor="end">3</text>
+            <path d="M40,95 C80,88 120,78 160,72 C200,66 240,62 280,65 C320,68 360,74 400,70 C430,67 445,68 455,67 L455,120 L40,120 Z" fill="url(#g15)"/>
+            <path d="M40,95 C80,88 120,78 160,72 C200,66 240,62 280,65 C320,68 360,74 400,70 C430,67 445,68 455,67" fill="none" stroke="#7eb26d" stroke-width="1.5"/>
+            <path d="M40,103 C80,98 120,92 160,88 C200,84 240,81 280,83 C320,85 360,89 400,86 C430,84 445,85 455,84 L455,120 L40,120 Z" fill="url(#g16)"/>
+            <path d="M40,103 C80,98 120,92 160,88 C200,84 240,81 280,83 C320,85 360,89 400,86 C430,84 445,85 455,84" fill="none" stroke="#eab839" stroke-width="1.5"/>
+            <line x1="40" y1="120" x2="455" y2="120" class="axis-line"/>
+            <text x="40"  y="130" class="axis-label" text-anchor="middle">00:00</text>
+            <text x="165" y="130" class="axis-label" text-anchor="middle">06:00</text>
+            <text x="290" y="130" class="axis-label" text-anchor="middle">12:00</text>
+            <text x="415" y="130" class="axis-label" text-anchor="middle">18:00</text>
+          </svg>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><span class="legend-swatch" style="background:#7eb26d"></span>total<span class="val">6</span><span style="color:#555;font-size:10px">max:11</span></div>
+          <div class="legend-item"><span class="legend-swatch" style="background:#eab839"></span>with positions<span class="val">4</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">978 Range</span>
+          <span class="panel-menu">⋯</span>
+        </div>
+        <div class="panel-body">
+          <svg viewBox="0 0 460 130" width="100%" height="130">
+            <defs>
+              <linearGradient id="g17" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#7eb26d" stop-opacity="0.30"/>
+                <stop offset="100%" stop-color="#7eb26d" stop-opacity="0.02"/>
+              </linearGradient>
+              <linearGradient id="g18" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#eab839" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="#eab839" stop-opacity="0.02"/>
+              </linearGradient>
+            </defs>
+            <line x1="40" y1="10" x2="455" y2="10" class="grid-line"/>
+            <line x1="40" y1="40" x2="455" y2="40" class="grid-line"/>
+            <line x1="40" y1="70" x2="455" y2="70" class="grid-line"/>
+            <line x1="40" y1="100" x2="455" y2="100" class="grid-line"/>
+            <text x="35" y="13" class="axis-label" text-anchor="end">250NM</text>
+            <text x="35" y="43" class="axis-label" text-anchor="end">180</text>
+            <text x="35" y="73" class="axis-label" text-anchor="end">120</text>
+            <text x="35" y="103" class="axis-label" text-anchor="end">60</text>
+            <path d="M40,55 C80,50 120,45 160,42 C200,39 240,38 280,40 C320,42 360,46 400,44 C430,43 445,42 455,42 L455,120 L40,120 Z" fill="url(#g17)"/>
+            <path d="M40,55 C80,50 120,45 160,42 C200,39 240,38 280,40 C320,42 360,46 400,44 C430,43 445,42 455,42" fill="none" stroke="#7eb26d" stroke-width="1.5"/>
+            <path d="M40,82 C80,79 120,76 160,74 C200,72 240,71 280,72 C320,73 360,76 400,74 C430,73 445,73 455,73 L455,120 L40,120 Z" fill="url(#g18)"/>
+            <path d="M40,82 C80,79 120,76 160,74 C200,72 240,71 280,72 C320,73 360,76 400,74 C430,73 445,73 455,73" fill="none" stroke="#eab839" stroke-width="1.5"/>
+            <line x1="40" y1="120" x2="455" y2="120" class="axis-line"/>
+            <text x="40"  y="130" class="axis-label" text-anchor="middle">00:00</text>
+            <text x="165" y="130" class="axis-label" text-anchor="middle">06:00</text>
+            <text x="290" y="130" class="axis-label" text-anchor="middle">12:00</text>
+            <text x="415" y="130" class="axis-label" text-anchor="middle">18:00</text>
+          </svg>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><span class="legend-swatch" style="background:#7eb26d"></span>max_range<span class="val">180 NM</span><span style="color:#555;font-size:10px">max:210NM</span></div>
+          <div class="legend-item"><span class="legend-swatch" style="background:#eab839"></span>median<span class="val">95 NM</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /#dash-adsb -->
+
+
+<!-- ═══════════════════════════════════════════════════════════ SYSTEM DASHBOARD -->
+<div id="dash-system" class="dashboard" style="display:none">
+
+  <!-- Row 1: CPU | Memory -->
+  <div class="panel-row">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">CPU Usage</span>
+        <span class="panel-menu">⋯</span>
+      </div>
+      <div class="panel-body">
+        <svg viewBox="0 0 460 130" width="100%" height="130">
+          <defs>
+            <linearGradient id="s0" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7eb26d" stop-opacity="0.30"/>
+              <stop offset="100%" stop-color="#7eb26d" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="s1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#eab839" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#eab839" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="s2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#6ed0e0" stop-opacity="0.20"/>
+              <stop offset="100%" stop-color="#6ed0e0" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <line x1="40" y1="10" x2="455" y2="10" class="grid-line"/>
+          <line x1="40" y1="40" x2="455" y2="40" class="grid-line"/>
+          <line x1="40" y1="70" x2="455" y2="70" class="grid-line"/>
+          <line x1="40" y1="100" x2="455" y2="100" class="grid-line"/>
+          <text x="35" y="13" class="axis-label" text-anchor="end">100%</text>
+          <text x="35" y="43" class="axis-label" text-anchor="end">75%</text>
+          <text x="35" y="73" class="axis-label" text-anchor="end">50%</text>
+          <text x="35" y="103" class="axis-label" text-anchor="end">25%</text>
+          <!-- user -->
+          <path d="M40,85 C80,80 120,72 160,68 C200,64 230,70 260,75 C290,79 320,72 360,65 C390,60 420,63 455,61 L455,120 L40,120 Z" fill="url(#s0)"/>
+          <path d="M40,85 C80,80 120,72 160,68 C200,64 230,70 260,75 C290,79 320,72 360,65 C390,60 420,63 455,61" fill="none" stroke="#7eb26d" stroke-width="1.5"/>
+          <!-- system -->
+          <path d="M40,96 C80,95 120,93 160,92 C200,91 230,93 260,95 C290,96 320,93 360,91 C390,90 420,91 455,90 L455,120 L40,120 Z" fill="url(#s1)"/>
+          <path d="M40,96 C80,95 120,93 160,92 C200,91 230,93 260,95 C290,96 320,93 360,91 C390,90 420,91 455,90" fill="none" stroke="#eab839" stroke-width="1.5"/>
+          <!-- iowait -->
+          <path d="M40,110 C80,109 120,110 160,109 C200,108 230,110 260,111 C290,110 320,109 360,110 C390,110 420,110 455,110 L455,120 L40,120 Z" fill="url(#s2)"/>
+          <path d="M40,110 C80,109 120,110 160,109 C200,108 230,110 260,111 C290,110 320,109 360,110 C390,110 420,110 455,110" fill="none" stroke="#6ed0e0" stroke-width="1.5"/>
+          <line x1="40" y1="120" x2="455" y2="120" class="axis-line"/>
+          <text x="40"  y="130" class="axis-label" text-anchor="middle">00:00</text>
+          <text x="165" y="130" class="axis-label" text-anchor="middle">06:00</text>
+          <text x="290" y="130" class="axis-label" text-anchor="middle">12:00</text>
+          <text x="415" y="130" class="axis-label" text-anchor="middle">18:00</text>
+        </svg>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#7eb26d"></span>user<span class="val">8.2%</span><span style="color:#555;font-size:10px">mean:9.1%</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#eab839"></span>system<span class="val">2.9%</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#6ed0e0"></span>iowait<span class="val">0.4%</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Memory</span>
+        <span class="panel-menu">⋯</span>
+      </div>
+      <div class="panel-body">
+        <svg viewBox="0 0 460 130" width="100%" height="130">
+          <defs>
+            <linearGradient id="s3" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#e24d42" stop-opacity="0.30"/>
+              <stop offset="100%" stop-color="#e24d42" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="s4" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7eb26d" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#7eb26d" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="s5" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#eab839" stop-opacity="0.20"/>
+              <stop offset="100%" stop-color="#eab839" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <line x1="40" y1="10" x2="455" y2="10" class="grid-line"/>
+          <line x1="40" y1="40" x2="455" y2="40" class="grid-line"/>
+          <line x1="40" y1="70" x2="455" y2="70" class="grid-line"/>
+          <line x1="40" y1="100" x2="455" y2="100" class="grid-line"/>
+          <text x="35" y="13" class="axis-label" text-anchor="end">4 GB</text>
+          <text x="35" y="43" class="axis-label" text-anchor="end">3 GB</text>
+          <text x="35" y="73" class="axis-label" text-anchor="end">2 GB</text>
+          <text x="35" y="103" class="axis-label" text-anchor="end">1 GB</text>
+          <!-- used -->
+          <path d="M40,72 C80,70 120,69 160,68 C200,67 240,68 280,69 C320,70 360,70 400,69 C430,69 445,69 455,69 L455,120 L40,120 Z" fill="url(#s3)"/>
+          <path d="M40,72 C80,70 120,69 160,68 C200,67 240,68 280,69 C320,70 360,70 400,69 C430,69 445,69 455,69" fill="none" stroke="#e24d42" stroke-width="1.5"/>
+          <!-- cached -->
+          <path d="M40,84 C80,83 120,82 160,82 C200,82 240,82 280,83 C320,83 360,83 400,83 C430,83 445,83 455,83 L455,120 L40,120 Z" fill="url(#s4)"/>
+          <path d="M40,84 C80,83 120,82 160,82 C200,82 240,82 280,83 C320,83 360,83 400,83 C430,83 445,83 455,83" fill="none" stroke="#7eb26d" stroke-width="1.5"/>
+          <!-- available -->
+          <path d="M40,56 C80,57 120,57 160,58 C200,58 240,57 280,56 C320,55 360,56 400,57 C430,57 445,57 455,57 L455,120 L40,120 Z" fill="url(#s5)"/>
+          <path d="M40,56 C80,57 120,57 160,58 C200,58 240,57 280,56 C320,55 360,56 400,57 C430,57 445,57 455,57" fill="none" stroke="#eab839" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <line x1="40" y1="120" x2="455" y2="120" class="axis-line"/>
+          <text x="40"  y="130" class="axis-label" text-anchor="middle">00:00</text>
+          <text x="165" y="130" class="axis-label" text-anchor="middle">06:00</text>
+          <text x="290" y="130" class="axis-label" text-anchor="middle">12:00</text>
+          <text x="415" y="130" class="axis-label" text-anchor="middle">18:00</text>
+        </svg>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#e24d42"></span>used<span class="val">1.84 GB</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#7eb26d"></span>cached<span class="val">920 MB</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#eab839"></span>available<span class="val">2.10 GB</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Disk Space | Disk I/O -->
+  <div class="panel-row">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Disk Space</span>
+        <span class="panel-menu">⋯</span>
+      </div>
+      <div class="panel-body">
+        <svg viewBox="0 0 460 130" width="100%" height="130">
+          <defs>
+            <linearGradient id="s6" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#e24d42" stop-opacity="0.30"/>
+              <stop offset="100%" stop-color="#e24d42" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="s7" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#eab839" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#eab839" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="s8" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7eb26d" stop-opacity="0.20"/>
+              <stop offset="100%" stop-color="#7eb26d" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <line x1="40" y1="10" x2="455" y2="10" class="grid-line"/>
+          <line x1="40" y1="40" x2="455" y2="40" class="grid-line"/>
+          <line x1="40" y1="70" x2="455" y2="70" class="grid-line"/>
+          <line x1="40" y1="100" x2="455" y2="100" class="grid-line"/>
+          <text x="35" y="13" class="axis-label" text-anchor="end">100%</text>
+          <text x="35" y="43" class="axis-label" text-anchor="end">75%</text>
+          <text x="35" y="73" class="axis-label" text-anchor="end">50%</text>
+          <text x="35" y="103" class="axis-label" text-anchor="end">25%</text>
+          <!-- / (root) gently climbing -->
+          <path d="M40,36 C120,34 200,33 280,32 C360,31 410,30 455,29 L455,120 L40,120 Z" fill="url(#s6)"/>
+          <path d="M40,36 C120,34 200,33 280,32 C360,31 410,30 455,29" fill="none" stroke="#e24d42" stroke-width="1.5"/>
+          <!-- /boot flat -->
+          <path d="M40,62 L455,61 L455,120 L40,120 Z" fill="url(#s7)"/>
+          <path d="M40,62 L455,61" fill="none" stroke="#eab839" stroke-width="1.5"/>
+          <!-- /var flat low -->
+          <path d="M40,97 L455,96 L455,120 L40,120 Z" fill="url(#s8)"/>
+          <path d="M40,97 L455,96" fill="none" stroke="#7eb26d" stroke-width="1.5"/>
+          <line x1="40" y1="120" x2="455" y2="120" class="axis-line"/>
+          <text x="40"  y="130" class="axis-label" text-anchor="middle">00:00</text>
+          <text x="165" y="130" class="axis-label" text-anchor="middle">06:00</text>
+          <text x="290" y="130" class="axis-label" text-anchor="middle">12:00</text>
+          <text x="415" y="130" class="axis-label" text-anchor="middle">18:00</text>
+        </svg>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#e24d42"></span>/<span class="val">73%</span><span style="color:#555;font-size:10px">last</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#eab839"></span>/boot<span class="val">38%</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#7eb26d"></span>/var<span class="val">9%</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Disk I/O</span>
+        <span class="panel-menu">⋯</span>
+      </div>
+      <div class="panel-body">
+        <svg viewBox="0 0 460 130" width="100%" height="130">
+          <defs>
+            <linearGradient id="s9" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7eb26d" stop-opacity="0.30"/>
+              <stop offset="100%" stop-color="#7eb26d" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="s10" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#6ed0e0" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#6ed0e0" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <line x1="40" y1="10" x2="455" y2="10" class="grid-line"/>
+          <line x1="40" y1="40" x2="455" y2="40" class="grid-line"/>
+          <line x1="40" y1="70" x2="455" y2="70" class="grid-line"/>
+          <line x1="40" y1="100" x2="455" y2="100" class="grid-line"/>
+          <text x="35" y="13" class="axis-label" text-anchor="end">10M/s</text>
+          <text x="35" y="43" class="axis-label" text-anchor="end">7M</text>
+          <text x="35" y="73" class="axis-label" text-anchor="end">4M</text>
+          <text x="35" y="103" class="axis-label" text-anchor="end">1M</text>
+          <!-- write spiky -->
+          <path d="M40,100 C60,100 80,60 100,55 C120,50 140,90 160,88 C180,85 200,40 220,35 C240,30 260,80 280,78 C300,75 320,95 360,90 C390,86 420,92 455,90 L455,120 L40,120 Z" fill="url(#s9)"/>
+          <path d="M40,100 C60,100 80,60 100,55 C120,50 140,90 160,88 C180,85 200,40 220,35 C240,30 260,80 280,78 C300,75 320,95 360,90 C390,86 420,92 455,90" fill="none" stroke="#7eb26d" stroke-width="1.5"/>
+          <!-- read low steady -->
+          <path d="M40,108 C80,107 120,108 160,107 C200,106 240,107 280,108 C320,107 360,108 400,107 C430,107 445,107 455,107 L455,120 L40,120 Z" fill="url(#s10)"/>
+          <path d="M40,108 C80,107 120,108 160,107 C200,106 240,107 280,108 C320,107 360,108 400,107 C430,107 445,107 455,107" fill="none" stroke="#6ed0e0" stroke-width="1.5"/>
+          <line x1="40" y1="120" x2="455" y2="120" class="axis-line"/>
+          <text x="40"  y="130" class="axis-label" text-anchor="middle">00:00</text>
+          <text x="165" y="130" class="axis-label" text-anchor="middle">06:00</text>
+          <text x="290" y="130" class="axis-label" text-anchor="middle">12:00</text>
+          <text x="415" y="130" class="axis-label" text-anchor="middle">18:00</text>
+        </svg>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#7eb26d"></span>write_bytes/s<span class="val">4.2 MB/s</span><span style="color:#555;font-size:10px">mean:3.1</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#6ed0e0"></span>read_bytes/s<span class="val">0.8 MB/s</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3: Network I/O | Temperature -->
+  <div class="panel-row">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Network I/O</span>
+        <span class="panel-menu">⋯</span>
+      </div>
+      <div class="panel-body">
+        <svg viewBox="0 0 460 130" width="100%" height="130">
+          <defs>
+            <linearGradient id="s11" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7eb26d" stop-opacity="0.30"/>
+              <stop offset="100%" stop-color="#7eb26d" stop-opacity="0.02"/>
+            </linearGradient>
+            <linearGradient id="s12" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#eab839" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#eab839" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <line x1="40" y1="10" x2="455" y2="10" class="grid-line"/>
+          <line x1="40" y1="40" x2="455" y2="40" class="grid-line"/>
+          <line x1="40" y1="70" x2="455" y2="70" class="grid-line"/>
+          <line x1="40" y1="100" x2="455" y2="100" class="grid-line"/>
+          <text x="35" y="13" class="axis-label" text-anchor="end">5M/s</text>
+          <text x="35" y="43" class="axis-label" text-anchor="end">3M</text>
+          <text x="35" y="73" class="axis-label" text-anchor="end">2M</text>
+          <text x="35" y="103" class="axis-label" text-anchor="end">0.5M</text>
+          <!-- recv -->
+          <path d="M40,68 C80,65 120,60 160,58 C200,56 240,55 280,57 C320,59 360,62 400,60 C430,59 445,59 455,58 L455,120 L40,120 Z" fill="url(#s11)"/>
+          <path d="M40,68 C80,65 120,60 160,58 C200,56 240,55 280,57 C320,59 360,62 400,60 C430,59 445,59 455,58" fill="none" stroke="#7eb26d" stroke-width="1.5"/>
+          <!-- sent -->
+          <path d="M40,90 C80,88 120,86 160,85 C200,84 240,84 280,85 C320,86 360,88 400,86 C430,85 445,85 455,85 L455,120 L40,120 Z" fill="url(#s12)"/>
+          <path d="M40,90 C80,88 120,86 160,85 C200,84 240,84 280,85 C320,86 360,88 400,86 C430,85 445,85 455,85" fill="none" stroke="#eab839" stroke-width="1.5"/>
+          <line x1="40" y1="120" x2="455" y2="120" class="axis-line"/>
+          <text x="40"  y="130" class="axis-label" text-anchor="middle">00:00</text>
+          <text x="165" y="130" class="axis-label" text-anchor="middle">06:00</text>
+          <text x="290" y="130" class="axis-label" text-anchor="middle">12:00</text>
+          <text x="415" y="130" class="axis-label" text-anchor="middle">18:00</text>
+        </svg>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#7eb26d"></span>bytes_recv/s (eth0)<span class="val">1.8 MB/s</span><span style="color:#555;font-size:10px">mean:1.7</span></div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#eab839"></span>bytes_sent/s (eth0)<span class="val">0.6 MB/s</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Temperature</span>
+        <span class="panel-menu">⋯</span>
+      </div>
+      <div class="panel-body">
+        <svg viewBox="0 0 460 130" width="100%" height="130">
+          <defs>
+            <linearGradient id="s13" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ef843c" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#ef843c" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <line x1="40" y1="10" x2="455" y2="10" class="grid-line"/>
+          <line x1="40" y1="40" x2="455" y2="40" class="grid-line"/>
+          <line x1="40" y1="70" x2="455" y2="70" class="grid-line"/>
+          <line x1="40" y1="100" x2="455" y2="100" class="grid-line"/>
+          <text x="35" y="13" class="axis-label" text-anchor="end">80°C</text>
+          <text x="35" y="43" class="axis-label" text-anchor="end">65°C</text>
+          <text x="35" y="73" class="axis-label" text-anchor="end">55°C</text>
+          <text x="35" y="103" class="axis-label" text-anchor="end">45°C</text>
+          <!-- throttle spike then settle -->
+          <path d="M40,70 C60,65 80,50 100,20 C110,10 130,35 160,55 C190,70 220,60 250,58 C280,56 310,58 340,60 C370,62 400,60 430,58 C440,57 450,57 455,57 L455,120 L40,120 Z" fill="url(#s13)"/>
+          <path d="M40,70 C60,65 80,50 100,20 C110,10 130,35 160,55 C190,70 220,60 250,58 C280,56 310,58 340,60 C370,62 400,60 430,58 C440,57 450,57 455,57" fill="none" stroke="#ef843c" stroke-width="1.5"/>
+          <line x1="40" y1="120" x2="455" y2="120" class="axis-line"/>
+          <text x="40"  y="130" class="axis-label" text-anchor="middle">00:00</text>
+          <text x="165" y="130" class="axis-label" text-anchor="middle">06:00</text>
+          <text x="290" y="130" class="axis-label" text-anchor="middle">12:00</text>
+          <text x="415" y="130" class="axis-label" text-anchor="middle">18:00</text>
+        </svg>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#ef843c"></span>cpu_thermal<span class="val">49 °C</span><span style="color:#555;font-size:10px">max:78°C</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /#dash-system -->
+
+<script>
+  function showDash(id, tabEl) {
+    document.getElementById('dash-adsb').style.display   = id === 'adsb'   ? '' : 'none';
+    document.getElementById('dash-system').style.display = id === 'system' ? '' : 'none';
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tabEl.classList.add('active');
+    const titles = { adsb: 'graphs1090 — ADS-B', system: 'System' };
+    document.getElementById('dash-title').textContent = titles[id];
+    document.getElementById('nav-title').textContent  = titles[id];
+  }
+
+  function toggle978(el) {
+    el.classList.toggle('open');
+    const content = document.getElementById('row-978');
+    content.style.display = el.classList.contains('open') ? '' : 'none';
+  }
+</script>
+</body>
+</html>
