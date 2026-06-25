@@ -51,23 +51,26 @@ fi
 echo "== 5. Install Telegraf config =="
 install -m 0644 "$here/telegraf/telegraf.conf" /etc/telegraf/telegraf.conf
 install -d /etc/telegraf/telegraf.d
-install -m 0644 "$here/telegraf/telegraf.d/10-adsb.conf" /etc/telegraf/telegraf.d/10-adsb.conf
+install -m 0644 "$here/telegraf/telegraf.d/10-adsb.conf"    /etc/telegraf/telegraf.d/10-adsb.conf
+install -m 0644 "$here/telegraf/telegraf.d/20-system.conf"  /etc/telegraf/telegraf.d/20-system.conf
 systemctl enable --now telegraf
 systemctl restart telegraf
 
 echo "== 6. Provision Grafana =="
 install -d /etc/grafana/provisioning/datasources /etc/grafana/provisioning/dashboards
 install -d /var/lib/grafana/dashboards/graphs1090
-install -m 0644 "$here/grafana/provisioning/datasources/influxdb.yaml" /etc/grafana/provisioning/datasources/influxdb.yaml
-install -m 0644 "$here/grafana/provisioning/dashboards/provider.yaml"   /etc/grafana/provisioning/dashboards/provider.yaml
-install -m 0644 "$here/grafana/provisioning/dashboards/adsb.json"       /var/lib/grafana/dashboards/graphs1090/adsb.json
+install -m 0644 "$here/grafana/provisioning/datasources/influxdb.yaml"    /etc/grafana/provisioning/datasources/influxdb.yaml
+install -m 0644 "$here/grafana/provisioning/dashboards/provider.yaml"      /etc/grafana/provisioning/dashboards/provider.yaml
+install -m 0644 "$here/grafana/provisioning/dashboards/adsb.json"          /var/lib/grafana/dashboards/graphs1090/adsb.json
+install -m 0644 "$here/grafana/provisioning/dashboards/system.json"        /var/lib/grafana/dashboards/graphs1090/system.json
 systemctl enable --now grafana-server
 systemctl restart grafana-server
 
 echo
-echo "== Done (Phase A, non-destructive) =="
+echo "== Done (Phase A+B, non-destructive) =="
 echo "Verify data is flowing:"
 echo "  influx -database graphs1090 -execute 'SELECT count(\"total\") FROM adsb_aircraft'"
 echo "Grafana:  http://$(hostname -I 2>/dev/null | awk '{print $1}'):3000  (admin/admin)"
-echo "Dashboard: graphs1090 -> 'graphs1090 — ADS-B (slice)'"
+echo "Dashboards: 'graphs1090 — ADS-B' and 'System'"
 echo "The old collectd/RRD graphs keep running unchanged."
+echo "Next step: sudo bash collector/cutover.sh  (Phase C — expose Grafana via web path)"

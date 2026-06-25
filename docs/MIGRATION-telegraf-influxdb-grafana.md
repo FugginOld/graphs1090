@@ -316,4 +316,40 @@ Single `airspy` measurement with all fields prefixed by metric name:
 | Network I/O | net | bytes_recv/s, bytes_sent/s (per interface) | Bps |
 | Temperature | temp | temp (per sensor) | celsius |
 
-**Next:** airspy measurements, then `system.json` Grafana dashboard (native Telegraf inputs — no custom code). On real hardware: run `sudo bash collector/bringup-slice.sh`, confirm all panels populate, then start Phase C cutover prep.
+On real hardware: `sudo bash collector/bringup-slice.sh` installs all Phase A+B files. Confirm all panels populate, then proceed to Phase C.
+
+---
+
+### Slice 6 — Phase C: cutover (Grafana behind web path) — BUILT ✅
+
+**`collector/cutover.sh`** — Phase C install script:
+
+1. Reconfigures Grafana to serve from `/grafana/` sub-path (`GF_SERVER_ROOT_URL` + `GF_SERVER_SERVE_FROM_SUB_PATH`).
+2. Installs lighttpd `90-grafana-proxy.conf` or appends nginx `/grafana/` proxy block, auto-detecting which web server is active.
+3. Reloads the web server.
+4. Old `/graphs1090/` PNGs keep serving unchanged as a fallback.
+
+**`config/http/90-grafana-proxy.conf`** — lighttpd `mod_proxy` snippet (WebSocket-capable).
+
+**`config/http/nginx-graphs1090.conf`** — updated: legacy ADS-B locations + new `/grafana/` proxy location in a single file.
+
+**`bringup-slice.sh`** — updated to also install `20-system.conf` and `system.json` (Phase B files added after the script was first written).
+
+Exit criterion: Grafana reachable at `http://<host>/grafana/`; old PNGs still at `/graphs1090/`.
+
+---
+
+### Slice 7 — Phase D: decommission — BUILT ✅
+
+**`collector/decommission.sh`** — gated Phase D cleanup script:
+
+- Requires typing `yes` to proceed (irreversibility gate).
+- Stops + disables collectd.
+- Removes legacy PNG render assets from `/usr/share/graphs1090/` (keeps new collector files).
+- Removes PNG output tmpfs and `/etc/fstab` entry.
+- Optional: removes `/graphs1090/` web conf (strips legacy blocks, keeps `/grafana/` block).
+- Optional: `apt-get purge collectd collectd-core`.
+- Does **not** touch `/var/lib/collectd/rrd/` (historical data; user deletes manually).
+- Does **not** touch Telegraf, InfluxDB, or Grafana.
+
+Exit criterion: only the Telegraf/InfluxDB/Grafana stack remains; `influx -database graphs1090 -execute 'SHOW MEASUREMENTS'` lists all measurements; Grafana panels show live data.
