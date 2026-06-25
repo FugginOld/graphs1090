@@ -36,6 +36,45 @@ sudo cp /usr/share/graphs1090/default-config /etc/default/graphs1090
 ```
 
 
+## Themes:
+
+The web page ships with a modernized dashboard layout (top bar + graph cards +
+a live "Now" sidebar) and a **theme switcher** offering six color schemes:
+
+| Theme            | Look                                            |
+|------------------|-------------------------------------------------|
+| `orig-light`     | Classic graphs1090 light scheme                 |
+| `orig-dark`      | Classic graphs1090 dark scheme                  |
+| `aviation`       | Dark phosphor-green radar / terminal aesthetic  |
+| `minimal`        | Clean light background, muted modern colors     |
+| `night`          | Dark navy dashboard, indigo accents             |
+| `retro`          | Modernized dark-green original style            |
+
+Pick a theme with the **Theme** buttons in the top bar — the choice is saved in
+your browser (and can be forced with `?theme=night` in the URL). The page chrome
+recolors instantly; the graphs themselves switch as soon as the next render of
+that theme's images is available.
+
+**How it works:** RRDtool bakes colors into each PNG at render time, so
+`graphs1090.sh` renders *every* enabled theme into its own folder
+(`graphs/<theme>/`). The page swaps folders to switch theme — no live recolor of
+existing images is possible.
+
+**Reducing the workload:** rendering all six themes is roughly six times the
+RRDtool work per cycle. To render only the themes you actually use, set
+`graph_themes` in `/etc/default/graphs1090`:
+```
+graph_themes="orig-light night"
+```
+Any theme you omit simply won't appear in the switcher. The default is all six:
+```
+graph_themes="orig-light orig-dark aviation minimal night retro"
+```
+
+The sidebar "Now" values are read from `graphs/stats.json`, written each render
+cycle from the current RRD samples.
+
+
 ## View the graphs:
 
 Click the following URL and replace the IP address with the IP address of the Raspberry Pi you installed combine1090 on.

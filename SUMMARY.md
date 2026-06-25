@@ -57,3 +57,45 @@ The `show_graph` mechanism was also a side-channel: a graph generation script wa
 The duplicated block encoded a non-obvious policy: the tmpfs path (`/run/collectd`) takes precedence over the configured path, but this override is intentionally never written back to the config file because users may have customised it. That reasoning was explained in a comment — which was also duplicated. When policy comments drift from the code they describe, the comment becomes misleading rather than helpful.
 
 With `resolve-config.sh` as the single owner of this logic, the policy and its explanation are collocated. Any future change to DB path resolution — supporting a third storage location, changing the autodetect condition, or adjusting the override priority — is a one-file edit with no risk of the two consumers falling out of sync.
+
+---
+
+## Issue 4 — Themes + dashboard (`graphs1090.sh`, `html/*`)
+
+**What changed:** The single light/dark `colorscheme` switch is replaced by six
+named themes, each rendered into its own image folder; the web UI becomes a
+dashboard (top bar, graph cards, live "Now" sidebar) with an in-page theme
+switcher.
+
+- `graphs1090.sh`: the old `colors=""`/`if dark` block is now `set_palette <theme>`
+  carrying full palettes for `orig-light`, `orig-dark`, `aviation`, `minimal`,
+  `night`, `retro`. The option strings that embed `$colors`/`$CANVAS` moved into
+  `compute_layout()` so they can be rebuilt per theme. Generation runs in a loop
+  over `$graph_themes`, writing each theme to `${DOCUMENTROOT}/<theme>/`.
+- New outputs at the graphs root: `themes.json` (which themes exist) and
+  `stats.json` (current sidebar values, via `rrdtool lastupdate` plus one CPU
+  `PRINT`). `manifest.json` is now written once at the base and deduped.
+- `html/index.html` is a dashboard; `portal.css` carries six `[data-theme]`
+  chrome palettes; `graphs.js` swaps the `graphs/<theme>/` folder for every image,
+  persists the choice (localStorage + `?theme=`), and fills the sidebar from
+  `stats.json`. All original image/panel IDs are preserved.
+
+**Observable:**
+- The page has a theme switcher and a stats sidebar. Switching theme recolors the
+  chrome instantly and loads that theme's PNGs.
+- Disk/CPU cost scales with the number of enabled themes (default six ≈ 6× the
+  prior RRDtool work). Trim with `graph_themes="..."` in `/etc/default/graphs1090`.
+- If `themes.json`/`stats.json` are missing (e.g. first load before a render),
+  the switcher falls back to the full list and the sidebar shows placeholders —
+  no console errors.
+
+**Why it's an improvement:**
+
+RRDtool bakes colors into the PNG at render time, so a browser can't recolor an
+existing graph. The folder-per-theme design makes that constraint explicit: the
+generator declares each theme's pixels under `graphs/<theme>/`, and the page's
+only job is to choose a folder. Theme color, page chrome, and image selection are
+three separate seams — palettes live in `set_palette`, chrome in CSS
+`[data-theme]` blocks, selection in `graphs.js` — instead of one global flag baked
+through the whole pipeline. Adding or tuning a theme is a localized edit on each
+side, and the workload is opt-out per deployment via `graph_themes`.

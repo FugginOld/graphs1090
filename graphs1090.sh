@@ -33,76 +33,133 @@ sheight=324
 font_size=10.0
 graph_size=default
 
-# default colorscheme
-colors=""
+# ---------------------------------------------------------------------------
+# Color themes
+# ---------------------------------------------------------------------------
+# set_palette <theme> sets CANVAS, the rrdtool -c color flags ($colors) and the
+# data-series hex variables every graph function uses. Six themes ship: the two
+# "orig" schemes are the classic light/dark palettes; the four new ones extend
+# the 5 seed colors from graphs1090-themes/*.sh into the full palette the graph
+# functions need. Edit the hex below to tune any theme.
+set_palette() {
+    # --- orig-light defaults (graphs1090 classic light scheme) ---
+    CANVAS=FFFFFF
+    colors=""
+    LGREEN=7de87d; GREEN=32CD32; DGREEN=228B22
+    LBLUE=4f59e3;  BLUE=0011EE;  ABLUE=0022DD; DBLUE=0033AA
+    LCYAN=29a7e6;  CYAN=00A0F0
+    RED=E30022;    DRED=990000;  LRED=FFCCCB
+    LIGHTYELLOW=FFFF99; AYELLOW=ffcc00
+    AGRAY=dddddd
 
-CANVAS=FFFFFF
-
-LGREEN=7de87d
-GREEN=32CD32
-DGREEN=228B22
-
-LBLUE=4f59e3
-BLUE=0011EE
-ABLUE=0022DD
-DBLUE=0033AA
-
-LCYAN=29a7e6
-CYAN=00A0F0
-
-RED=E30022
-DRED=990000
-LRED=FFCCCB
-
-LIGHTYELLOW=FFFF99
-AYELLOW=ffcc00
-
-
-AGRAY=dddddd
-
+    case "$1" in
+    orig-dark|dark)
+        CANVAS=161618
+        colors="\
+            -c CANVAS#$CANVAS \
+            -c BACK#2a2e31 \
+            -c FONT#f2f5f4 \
+            -c AXIS#f2f5f4 \
+            -c FRAME#888888 \
+            -c GRID#444444 \
+            -c MGRID#444444 \
+            -c SHADEA#212427 \
+            -c SHADEB#171a1c \
+            "
+        LGREEN=1db992; GREEN=386619; DGREEN=5cb85c
+        LBLUE=7fc7ff;  BLUE=1cb992;  ABLUE=0c5685; DBLUE=10366f
+        CYAN=00A0F0;   LCYAN=29a7e6
+        RED=c52b2f;    DRED=c52b2f;  LRED=a6595c
+        LIGHTYELLOW=444444; AYELLOW=cca300
+        AGRAY=2a2e31
+        ;;
+    aviation)
+        CANVAS=06100a
+        colors="\
+            -c CANVAS#06100a \
+            -c BACK#06100a \
+            -c FONT#4ade80 \
+            -c AXIS#2d6e3e \
+            -c FRAME#0a1c0f \
+            -c GRID#0d2614 \
+            -c MGRID#1a4028 \
+            -c SHADEA#06100a \
+            -c SHADEB#06100a \
+            "
+        LGREEN=86efac; GREEN=4ade80; DGREEN=2d6e3e
+        LBLUE=67e8f9;  BLUE=22d3ee;  ABLUE=0e7490; DBLUE=155e75
+        CYAN=22d3ee;   LCYAN=a5f3fc
+        RED=f87171;    DRED=dc2626;  LRED=fca5a5
+        LIGHTYELLOW=fde68a; AYELLOW=facc15
+        AGRAY=0a1c0f
+        ;;
+    minimal)
+        CANVAS=ffffff
+        colors="\
+            -c CANVAS#ffffff \
+            -c BACK#f4f4f0 \
+            -c FONT#1a1a1a \
+            -c AXIS#888888 \
+            -c FRAME#e0e0db \
+            -c GRID#e0e0e0 \
+            -c MGRID#c8c8c8 \
+            -c SHADEA#e8e8e4 \
+            -c SHADEB#d8d8d4 \
+            "
+        LGREEN=86efac; GREEN=22c55e; DGREEN=16a34a
+        LBLUE=93c5fd;  BLUE=3b82f6;  ABLUE=60a5fa; DBLUE=1d4ed8
+        CYAN=06b6d4;   LCYAN=67e8f9
+        RED=ef4444;    DRED=b91c1c;  LRED=fca5a5
+        LIGHTYELLOW=fde68a; AYELLOW=f59e0b
+        AGRAY=e5e5e5
+        ;;
+    night)
+        CANVAS=161b22
+        colors="\
+            -c CANVAS#161b22 \
+            -c BACK#0d1117 \
+            -c FONT#e2e8f0 \
+            -c AXIS#475569 \
+            -c FRAME#1e2936 \
+            -c GRID#1e2936 \
+            -c MGRID#253447 \
+            -c SHADEA#0d1117 \
+            -c SHADEB#0d1117 \
+            "
+        LGREEN=a5b4fc; GREEN=818cf8; DGREEN=6366f1
+        LBLUE=7dd3fc;  BLUE=38bdf8;  ABLUE=0ea5e9; DBLUE=0369a1
+        CYAN=38bdf8;   LCYAN=7dd3fc
+        RED=f87171;    DRED=dc2626;  LRED=fca5a5
+        LIGHTYELLOW=fed7aa; AYELLOW=fb923c
+        AGRAY=253447
+        ;;
+    retro)
+        CANVAS=131313
+        colors="\
+            -c CANVAS#131313 \
+            -c BACK#131313 \
+            -c FONT#c9c9c9 \
+            -c AXIS#5a5a5a \
+            -c FRAME#1e1e1e \
+            -c GRID#222222 \
+            -c MGRID#333333 \
+            -c SHADEA#131313 \
+            -c SHADEB#131313 \
+            "
+        LGREEN=7dd35a; GREEN=5db329; DGREEN=4a8f20
+        LBLUE=67e8f9;  BLUE=00e0ff;  ABLUE=0891b2; DBLUE=155e75
+        CYAN=00e0ff;   LCYAN=a5f3fc
+        RED=cc2e2e;    DRED=991b1b;  LRED=e87171
+        LIGHTYELLOW=f5c542; AYELLOW=e8820a
+        AGRAY=2a2a2a
+        ;;
+    orig-light|light|*)
+        : # keep the defaults set above
+        ;;
+    esac
+}
 
 source /usr/share/graphs1090/resolve-config.sh
-
-if [[ "$colorscheme" == "dark" ]]; then
-    CANVAS=161618
-    colors="\
-        -c CANVAS#$CANVAS \
-        -c BACK#2a2e31 \
-        -c FONT#f2f5f4 \
-        -c AXIS#f2f5f4 \
-        -c FRAME#888888 \
-        -c GRID#444444 \
-        -c MGRID#444444 \
-        -c SHADEA#212427 \
-        -c SHADEB#171a1c \
-        "
-
-    LGREEN=1db992
-    DGREEN=5cb85c
-    GREEN=3d532d
-
-    GREEN=386619
-
-
-
-    LBLUE=7fc7ff
-    BLUE=1cb992
-    ABLUE=0c5685
-    DBLUE=10366f
-
-    CYAN=00A0F0
-    LCYAN=29a7e6
-
-    RED=c52b2f
-    DRED=c52b2f
-    LRED=a6595c
-
-    LIGHTYELLOW=444444
-    AYELLOW=cca300
-
-
-    AGRAY=2a2e31
-fi
 
 source /etc/default/graphs1090
 
@@ -150,15 +207,19 @@ case $graph_size in
 esac
 
 
-fontsize="-n TITLE:$(mult 1.1 $font_size):. -n AXIS:$(mult 0.8 $font_size):. -n UNIT:$(mult 0.9 $font_size):. -n LEGEND:$(mult 0.9 $font_size):."
-grid="-c GRID#FFFFFF --grid-dash 2:1"
-options="$grid $fontsize -e $(date +%H:%M) $colors"
-small="$options -D --width $swidth --height $sheight"
-big="$options --width $lwidth --height $lheight"
+# Layout/option strings embed $colors + $CANVAS, so they are rebuilt per theme
+# inside the generation loop via compute_layout.
+compute_layout() {
+	fontsize="-n TITLE:$(mult 1.1 $font_size):. -n AXIS:$(mult 0.8 $font_size):. -n UNIT:$(mult 0.9 $font_size):. -n LEGEND:$(mult 0.9 $font_size):."
+	grid="-c GRID#FFFFFF --grid-dash 2:1"
+	options="$grid $fontsize -e $(date +%H:%M) $colors"
+	small="$options -D --width $swidth --height $sheight"
+	big="$options --width $lwidth --height $lheight"
 
-if [[ $all_large == "yes" ]]; then
-	small="$options --width $lwidth --height $lheight"
-fi
+	if [[ $all_large == "yes" ]]; then
+		small="$options --width $lwidth --height $lheight"
+	fi
+}
 
 
 # load bash sleep builtin if available
@@ -1281,11 +1342,101 @@ function register_active_graph() {
 function write_manifest() {
     local json='['
     local first=true
+    local seen=" "
     for key in "${_active_graphs[@]}"; do
+        # dedupe (the theme loop registers the same panels once per theme)
+        [[ "$seen" == *" $key "* ]] && continue
+        seen+="$key "
         if $first; then json+="\"$key\""; first=false; else json+=",\"$key\""; fi
     done
     json+=']'
-    echo "$json" > "${DOCUMENTROOT}/manifest.json"
+    echo "$json" > "${1:-${DOCUMENTROOT}}/manifest.json"
+}
+
+function write_themes_manifest() {
+    local json='['
+    local first=true
+    for t in $graph_themes; do
+        if $first; then json+="\"$t\""; first=false; else json+=",\"$t\""; fi
+    done
+    json+=']'
+    echo "$json" > "${BASE_DOCROOT}/themes.json"
+}
+
+# --- sidebar "Now" stats -----------------------------------------------------
+# rrd_last <rrd-file> <ds-name>  ->  last sample for that DS (empty if missing)
+rrd_last() {
+    local f="$1" ds="$2"
+    [[ -f "$f" ]] || return 0
+    rrdtool lastupdate "$f" 2>/dev/null | awk -v ds="$ds" '
+        $0 !~ /:/ { for (i=1;i<=NF;i++) if ($i==ds) col=i; next }
+        { split($0,a,":"); n=split(a[2],v," "); if (col>0 && col<=n) last=v[col] }
+        END { print last }'
+}
+
+# jnum <value> [multiplier] [decimals]  ->  JSON number or null
+jnum() {
+    local v="$1" m="${2:-1}" d="${3:-2}"
+    LC_ALL=C awk -v v="$v" -v m="$m" -v d="$d" 'BEGIN{
+        if (v=="" || v=="U" || tolower(v)=="nan" || tolower(v)=="-nan" || (v+0)!=v) { printf "null"; }
+        else { printf "%.*f", d, v*m }
+    }'
+}
+
+# system CPU % (LAST) derived the same way as the CPU graph
+stats_cpu() {
+    local cpud="$DB/$collectd_hostname/aggregation-cpu-average"
+    [[ -d "$cpud" ]] || { printf 'null'; return; }
+    local v
+    v=$(rrdtool graph /dev/null --start end-300 --end now \
+        "DEF:idle=$cpud/cpu-idle.rrd:value:AVERAGE" \
+        "DEF:interrupt=$cpud/cpu-interrupt.rrd:value:AVERAGE" \
+        "DEF:nice=$cpud/cpu-nice.rrd:value:AVERAGE" \
+        "DEF:softirq=$cpud/cpu-softirq.rrd:value:AVERAGE" \
+        "DEF:steal=$cpud/cpu-steal.rrd:value:AVERAGE" \
+        "DEF:system=$cpud/cpu-system.rrd:value:AVERAGE" \
+        "DEF:user=$cpud/cpu-user.rrd:value:AVERAGE" \
+        "DEF:wait=$cpud/cpu-wait.rrd:value:AVERAGE" \
+        "CDEF:all=idle,interrupt,nice,softirq,steal,system,user,wait,+,+,+,+,+,+,+" \
+        "CDEF:usage=interrupt,nice,softirq,steal,system,user,wait,+,+,+,+,+,+" \
+        "CDEF:pusage=100,usage,*,all,/" \
+        "PRINT:pusage:LAST:%.1lf" 2>/dev/null | tail -1)
+    jnum "$v" 1 1
+}
+
+write_stats_json() {
+    local D1090="$DB/$collectd_hostname/dump1090-$dump1090_instance"
+    local SYS="$DB/$collectd_hostname"
+    local NMI=0.000539956803
+    {
+        echo "{"
+        echo "  \"updated\": $(date +%s),"
+        echo "  \"aircraft\": {"
+        echo "    \"total\": $(jnum "$(rrd_last "$D1090/dump1090_aircraft-recent.rrd" total)" 1 0),"
+        echo "    \"positions\": $(jnum "$(rrd_last "$D1090/dump1090_aircraft-recent.rrd" positions)" 1 0),"
+        echo "    \"mlat\": $(jnum "$(rrd_last "$D1090/dump1090_mlat-recent.rrd" value)" 1 0),"
+        echo "    \"tisb\": $(jnum "$(rrd_last "$D1090/dump1090_tisb-recent.rrd" value)" 1 0)"
+        echo "  },"
+        echo "  \"range\": {"
+        echo "    \"max_nmi\": $(jnum "$(rrd_last "$D1090/dump1090_range-max_range.rrd" value)" $NMI 1),"
+        echo "    \"median_nmi\": $(jnum "$(rrd_last "$D1090/dump1090_range-median.rrd" value)" $NMI 1)"
+        echo "  },"
+        echo "  \"signal\": {"
+        echo "    \"median\": $(jnum "$(rrd_last "$D1090/dump1090_dbfs-median.rrd" value)" 1 1),"
+        echo "    \"peak\": $(jnum "$(rrd_last "$D1090/dump1090_dbfs-peak_signal.rrd" value)" 1 1)"
+        echo "  },"
+        echo "  \"message_rate\": $(jnum "$(rrd_last "$D1090/dump1090_messages-local_accepted.rrd" value)" 1 1),"
+        echo "  \"system\": {"
+        echo "    \"cpu\": $(stats_cpu),"
+        echo "    \"temp_c\": $(jnum "$(rrd_last "$SYS/table-$dump1090_instance/gauge-cpu_temp.rrd" value)" 0.001 1),"
+        echo "    \"mem_used\": $(jnum "$(rrd_last "$SYS/system_stats/memory-used.rrd" value)" 1 0),"
+        echo "    \"mem_free\": $(jnum "$(rrd_last "$SYS/system_stats/memory-free.rrd" value)" 1 0),"
+        echo "    \"mem_cached\": $(jnum "$(rrd_last "$SYS/system_stats/memory-cached.rrd" value)" 1 0),"
+        echo "    \"disk_used\": $(jnum "$(rrd_last "$SYS/df-root/df_complex-used.rrd" value)" 1 0),"
+        echo "    \"disk_free\": $(jnum "$(rrd_last "$SYS/df-root/df_complex-free.rrd" value)" 1 0)"
+        echo "  }"
+        echo "}"
+    } > "${BASE_DOCROOT}/stats.json" 2>/dev/null || true
 }
 
 dump1090_graphs() {
@@ -1353,9 +1504,30 @@ nowlit=$(date -d "$END_TIME" '+%Y-%m-%d %H:%M %Z')
 dump1090_instance="localhost"
 collectd_hostname="localhost"
 
-if [[ -z $1 ]]
-then
-	dump1090_receiver_graphs $collectd_hostname $dump1090_instance "ADS-B" "24h" "$step"
-else
-	dump1090_receiver_graphs $collectd_hostname $dump1090_instance "ADS-B" "$period" "$step"
+# Period to draw (default 24h when invoked with no period argument)
+if [[ -z $1 ]]; then
+	period="24h"
 fi
+
+# Themes to generate. Override in /etc/default/graphs1090, e.g.
+#   graph_themes="orig-light night retro"
+# Each theme is rendered into a graphs/<theme>/ subfolder; the web page swaps
+# folders to switch theme live.
+: "${graph_themes:=orig-light orig-dark aviation minimal night retro}"
+
+BASE_DOCROOT="$DOCUMENTROOT"
+
+for theme in $graph_themes; do
+	set_palette "$theme"
+	compute_layout
+	DOCUMENTROOT="$BASE_DOCROOT/$theme"
+	mkdir -p "$DOCUMENTROOT"
+	_active_graphs=()
+	dump1090_receiver_graphs $collectd_hostname $dump1090_instance "ADS-B" "$period" "$step"
+done
+
+# Base-level metadata for the web page (panels, theme list, sidebar stats)
+DOCUMENTROOT="$BASE_DOCROOT"
+write_manifest "$BASE_DOCROOT"
+write_themes_manifest
+write_stats_json
