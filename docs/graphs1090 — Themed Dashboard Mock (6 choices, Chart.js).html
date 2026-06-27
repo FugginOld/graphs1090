@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<!-- saved from url=(0067)file:///C:/Users/Joe/AppData/Local/Temp/graphs1090-themes-mock.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>graphs1090 — Themed Dashboard Mock (6 choices, Chart.js)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="./graphs1090 — Themed Dashboard Mock (6 choices, Chart.js)_files/css2" rel="stylesheet">
+<script src="./graphs1090 — Themed Dashboard Mock (6 choices, Chart.js)_files/chart.umd.min.js.download"></script>
+<style>
+  /* ── Theme chrome palettes (page shell). Chart colors live in CHART_CFG (JS). ── */
+  [data-theme="orig-light"] { --bg:#ececed; --surface:#ffffff; --border:#cfcfcf; --plot-bg:#ffffff; --text:#1a1a1a; --muted:#666; --accent:#0011ee; --area:#228B22; --amber:#d98c00; --purple:#0011EE; --red:#E30022; --font:'Space Grotesk',sans-serif; }
+  [data-theme="orig-dark"]  { --bg:#161618; --surface:#212427; --border:#3a3d40; --plot-bg:#161618; --text:#f2f5f4; --muted:#9aa0a0; --accent:#1cb992; --area:#5cb85c; --amber:#cca300; --purple:#7fc7ff; --red:#c52b2f; --font:'Space Grotesk',sans-serif; }
+  [data-theme="aviation"]   { --bg:#040b07; --surface:#06100a; --border:#16331f; --plot-bg:#06100a; --text:#4ade80; --muted:#2d6e3e; --accent:#22d3ee; --area:#4ade80; --amber:#facc15; --purple:#22d3ee; --red:#f87171; --font:'Space Mono',monospace; }
+  [data-theme="minimal"]    { --bg:#f4f4f0; --surface:#ffffff; --border:#e0e0db; --plot-bg:#ffffff; --text:#1a1a1a; --muted:#888; --accent:#3b82f6; --area:#16a34a; --amber:#f59e0b; --purple:#6366f1; --red:#ef4444; --font:'Space Grotesk',sans-serif; }
+  [data-theme="night"]      { --bg:#0d1117; --surface:#161b22; --border:#26303c; --plot-bg:#161b22; --text:#e2e8f0; --muted:#475569; --accent:#818cf8; --area:#818cf8; --amber:#fb923c; --purple:#a78bfa; --red:#f87171; --font:'Space Grotesk',sans-serif; }
+  [data-theme="retro"]      { --bg:#0e0e0e; --surface:#131313; --border:#2a2a2a; --plot-bg:#131313; --text:#c9c9c9; --muted:#5a5a5a; --accent:#00e0ff; --area:#5db329; --amber:#e8820a; --purple:#00e0ff; --red:#cc2e2e; --font:'Space Mono',monospace; }
+
+  :root { --graph-h: 300px; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; min-height: 100vh; transition: background .15s,color .15s; }
+
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; gap: 12px; flex-wrap: wrap; }
+  .topbar h1 { font-size: 15px; font-weight: 600; color: var(--text); white-space: nowrap; }
+  .topbar-controls { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .ctl-label { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
+  .btn-group { display: flex; gap: 3px; flex-wrap: wrap; }
+  .btn { background: var(--bg); border: 1px solid var(--border); color: var(--muted); padding: 3px 9px; border-radius: 5px; font-size: 12px; cursor: pointer; transition: all .12s; white-space: nowrap; font-family: var(--font); }
+  .btn:hover { border-color: var(--accent); color: var(--text); }
+  .btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .theme-btn { display: flex; align-items: center; gap: 6px; padding-left: 6px; }
+  .theme-btn .sw { width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(128,128,128,.4); flex-shrink: 0; }
+
+  .layout { display: grid; grid-template-columns: 1fr 276px; min-height: calc(100vh - 46px); }
+  .main { padding: 16px; border-right: 1px solid var(--border); overflow-y: auto; }
+
+  .mock-banner { background: color-mix(in srgb, var(--accent) 12%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: 8px; padding: 9px 13px; font-size: 12px; color: var(--text); margin-bottom: 16px; line-height: 1.5; }
+  .mock-banner code { background: color-mix(in srgb, var(--accent) 20%, transparent); padding: 1px 4px; border-radius: 3px; }
+
+  .section-title { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 20px 0 10px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+  .section-title:first-of-type { margin-top: 0; }
+
+  .graph-grid { display: grid; gap: 10px; }
+  .graph-grid.cols-1 { grid-template-columns: 1fr; }
+  .graph-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+
+  .graph-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .graph-card-header { padding: 7px 13px; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .live-badge { font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--area); border: 1px solid color-mix(in srgb, var(--area) 40%, transparent); border-radius: 4px; padding: 1px 5px; }
+  .graph-card-body { background: var(--plot-bg); height: var(--graph-h); padding: 10px 12px; }
+  .graph-card-body.tall { height: 360px; }
+  .chart-wrap { position: relative; width: 100%; height: 100%; }
+  .chart-wrap canvas { width: 100% !important; height: 100% !important; }
+
+  /* legend */
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 10px; padding: 6px 13px 9px; color: var(--muted); }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+  .legend-dot.round { border-radius: 50%; }
+
+  .sidebar { padding: 14px; background: var(--surface); overflow-y: auto; }
+  .sidebar-section { margin-bottom: 20px; }
+  .sidebar-section-title { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 9px; padding-bottom: 5px; border-bottom: 1px solid var(--border); }
+  .stat-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; margin-bottom: 7px; }
+  .stat-label { font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+  .stat-value-row { display: flex; align-items: baseline; gap: 5px; }
+  .stat-value { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; color: var(--text); }
+  .stat-unit { font-size: 11px; color: var(--muted); font-weight: 500; }
+  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .sparkbar { height:3px; background:var(--border); border-radius:2px; margin-top:7px; overflow:hidden; }
+  .sparkbar-fill { height:100%; border-radius:2px; }
+  .sidebar-footer { font-size: 9px; color: var(--muted); text-align: center; margin-top: 6px; }
+</style>
+</head>
+<body data-theme="retro">
+
+<div class="topbar">
+  <h1>graphs1090 &nbsp;·&nbsp; Performance Graphs</h1>
+  <div class="topbar-controls">
+    <div style="display:flex;align-items:center"><span class="ctl-label">Theme</span><div class="btn-group" id="theme-group"><button class="btn theme-btn" data-id="orig-light"><span class="sw" style="background:#32CD32"></span>Original · Light</button><button class="btn theme-btn" data-id="orig-dark"><span class="sw" style="background:#386619"></span>Original · Dark</button><button class="btn theme-btn" data-id="aviation"><span class="sw" style="background:#4ade80"></span>Aviation</button><button class="btn theme-btn" data-id="minimal"><span class="sw" style="background:#16a34a"></span>Minimal</button><button class="btn theme-btn" data-id="night"><span class="sw" style="background:#818cf8"></span>Night</button><button class="btn theme-btn active" data-id="retro"><span class="sw" style="background:#5db329"></span>Retro</button></div></div>
+    <div style="display:flex;align-items:center"><span class="ctl-label">Range</span>
+      <div class="btn-group" id="tf-group">
+        <button class="btn active" onclick="setTF(this)">2h</button>
+        <button class="btn" onclick="setTF(this)">8h</button>
+        <button class="btn" onclick="setTF(this)">24h</button>
+        <button class="btn" onclick="setTF(this)">7d</button>
+        <button class="btn" onclick="setTF(this)">30d</button>
+        <button class="btn" onclick="setTF(this)">1 yr</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+<div class="main">
+
+  <div class="mock-banner">
+    <strong>Mockup — 6 themes, real Chart.js graphs.</strong>
+    Click a theme: chrome + every chart recolor (gradient fills, dot-grid, dual axis, themed ticks/grid/tooltip — same engine as your <code>mockup.html</code>).
+    In production these become rrdtool PNGs from <code>graphs/&lt;theme&gt;/</code>; this preview uses live charts so you can judge each palette.
+  </div>
+
+  <div class="section-title">ADS-B 1090</div>
+
+  <div class="graph-grid cols-1" style="margin-bottom:10px">
+    <div class="graph-card">
+      <div class="graph-card-header">ADS-B Message Rate <span class="live-badge">live</span></div>
+      <div class="graph-card-body"><div class="chart-wrap"><canvas id="c-msgrate" style="box-sizing: border-box; display: block; height: 280px; width: 1570px;" width="1570" height="280"></canvas></div></div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-dot" style="background:var(--area)"></span>Messages Received</div>
+        <div class="legend-item"><span class="legend-dot round" style="background:var(--muted)"></span>7-Day Average</div>
+        <div class="legend-item"><span class="legend-dot round" style="background:var(--accent)"></span>Positions/s (RHS)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="graph-grid cols-1" style="margin-bottom:10px">
+    <div class="graph-card">
+      <div class="graph-card-header">Aircraft Seen / Tracked</div>
+      <div class="graph-card-body tall"><div class="chart-wrap"><canvas id="c-aircraft" style="box-sizing: border-box; display: block; height: 340px; width: 1570px;" width="1570" height="340"></canvas></div></div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-dot" style="background:var(--area)"></span>Seen / Tracked</div>
+        <div class="legend-item"><span class="legend-dot round" id="lg-adsb" style="background: rgb(0, 224, 255);"></span>w/ ADS-B</div>
+        <div class="legend-item"><span class="legend-dot round" id="lg-mlat" style="background: rgba(220, 220, 220, 0.65);"></span>w/ MLAT</div>
+        <div class="legend-item"><span class="legend-dot round" id="lg-tisb" style="background: rgb(232, 130, 10);"></span>w/ TIS-B</div>
+        <div class="legend-item"><span class="legend-dot round" id="lg-npos" style="background: rgb(204, 46, 46);"></span>w/o pos.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="graph-grid cols-2" style="margin-bottom:10px">
+    <div class="graph-card">
+      <div class="graph-card-header">Tracks Seen</div>
+      <div class="graph-card-body"><div class="chart-wrap"><canvas id="c-tracks" style="box-sizing: border-box; display: block; height: 280px; width: 767px;" width="767" height="280"></canvas></div></div>
+    </div>
+    <div class="graph-card">
+      <div class="graph-card-header">Max Range</div>
+      <div class="graph-card-body"><div class="chart-wrap"><canvas id="c-range" style="box-sizing: border-box; display: block; height: 280px; width: 767px;" width="767" height="280"></canvas></div></div>
+    </div>
+  </div>
+
+  <div class="graph-grid cols-2" style="margin-bottom:10px">
+    <div class="graph-card">
+      <div class="graph-card-header">Signal Level</div>
+      <div class="graph-card-body"><div class="chart-wrap"><canvas id="c-signal" style="box-sizing: border-box; display: block; height: 280px; width: 767px;" width="767" height="280"></canvas></div></div>
+    </div>
+    <div class="graph-card">
+      <div class="graph-card-header">Aircraft Message Rate</div>
+      <div class="graph-card-body"><div class="chart-wrap"><canvas id="c-acmsg" style="box-sizing: border-box; display: block; height: 280px; width: 767px;" width="767" height="280"></canvas></div></div>
+    </div>
+  </div>
+
+  <div class="section-title">System</div>
+
+  <div class="graph-grid cols-2">
+    <div class="graph-card">
+      <div class="graph-card-header">CPU Utilization</div>
+      <div class="graph-card-body"><div class="chart-wrap"><canvas id="c-cpu" style="box-sizing: border-box; display: block; height: 280px; width: 767px;" width="767" height="280"></canvas></div></div>
+    </div>
+    <div class="graph-card">
+      <div class="graph-card-header">Core Temperature</div>
+      <div class="graph-card-body"><div class="chart-wrap"><canvas id="c-temp" style="box-sizing: border-box; display: block; height: 280px; width: 767px;" width="767" height="280"></canvas></div></div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">ADS-B 1090 · Now</div>
+    <div class="stat-card"><div class="stat-label">Aircraft</div><div class="stat-value-row"><span class="stat-value" style="color:var(--area)">187</span><span class="stat-unit">seen</span></div><div class="stat-sub"><span>142 w/ pos</span><span>8 mlat</span></div><div class="sparkbar"><div class="sparkbar-fill" style="width:74%;background:var(--area)"></div></div></div>
+    <div class="stat-card"><div class="stat-label">Max Range</div><div class="stat-value-row"><span class="stat-value" style="color:var(--amber)">247</span><span class="stat-unit">nmi</span></div><div class="sparkbar"><div class="sparkbar-fill" style="width:62%;background:var(--amber)"></div></div></div>
+    <div class="stat-card"><div class="stat-label">Signal · Median</div><div class="stat-value-row"><span class="stat-value" style="color:var(--purple)">−22.4</span><span class="stat-unit">dBFS</span></div><div class="sparkbar"><div class="sparkbar-fill" style="width:55%;background:var(--purple)"></div></div></div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">System · Now</div>
+    <div class="stat-card"><div class="stat-label">CPU</div><div class="stat-value-row"><span class="stat-value" style="color:var(--area)">14.2</span><span class="stat-unit">%</span></div><div class="sparkbar"><div class="sparkbar-fill" style="width:14%;background:var(--area)"></div></div></div>
+    <div class="stat-card"><div class="stat-label">Temperature</div><div class="stat-value-row"><span class="stat-value" style="color:var(--red)">58.4</span><span class="stat-unit">°C</span></div><div class="sparkbar"><div class="sparkbar-fill" style="width:58%;background:var(--red)"></div></div></div>
+  </div>
+  <div class="sidebar-footer">Theme preview · live recolor</div>
+</div>
+</div><!-- /layout -->
+
+<script>
+/* ── Data (shape from your mockup.html, extended) ── */
+const LABELS = ['18','19','20','21','22','23','00','01','02','03','04','05','06','07','08','09','10','11','12','13','14'];
+const SEEN=[122,131,128,117,105,90,63,46,34,28,22,29,44,74,105,126,140,152,161,157,148];
+const ADSB=[108,116,113,103,93,79,56,40,29,23,18,25,39,67,96,114,128,141,150,145,137];
+const MLAT=[9,8,9,9,8,7,4,4,3,3,2,2,3,5,7,9,9,9,9,9,8];
+const TISB=[3,3,3,2,2,2,2,2,1,1,1,1,2,2,2,3,3,3,3,3,2];
+const NPOS=[2,4,3,3,2,2,1,0,1,1,1,1,0,0,0,0,0,0,0,0,1];
+const MSG =[640,690,670,610,560,470,330,250,180,150,120,160,250,420,600,720,820,900,980,940,880];
+const AVG7=[560,580,575,560,540,500,440,400,360,340,320,350,420,520,610,680,740,790,830,820,800];
+const POS =[88,94,92,84,76,64,46,34,25,20,16,22,34,58,82,98,110,118,126,122,116];
+const TRACKS=[60,90,120,150,180,210,260,300,340,360,380,360,330,300,260,220,180,150,120,95,80].reverse();
+const RNG_MAX=[210,225,232,240,236,228,250,255,260,258,254,256,262,268,255,248,260,255,266,270,258];
+const RNG_MED=[150,158,160,163,159,152,165,168,170,167,160,164,170,176,168,160,166,170,176,180,170];
+const SIG_PEAK=[-11,-10,-12,-9,-10,-13,-9,-12,-11,-10,-12,-9,-11,-10,-12,-9,-11,-13,-10,-9,-11];
+const SIG_MED=[-24,-23,-25,-22,-23,-26,-22,-25,-24,-23,-25,-22,-24,-23,-25,-22,-24,-26,-23,-22,-24];
+const CPU_USER=[8,9,8,10,9,8,7,8,9,8,10,9,8,9,10,9,8,9,8,9,8];
+const CPU_SYS =[6,6,7,6,7,6,5,6,6,5,7,6,6,7,6,6,5,6,7,6,6];
+const ACMSG=[5.2,5.6,5.4,5.0,4.6,4.0,3.2,2.6,2.0,1.8,1.6,2.0,2.8,3.8,4.8,5.4,5.8,6.2,6.6,6.4,6.0];
+const TEMP=[52,54,55,57,56,55,53,52,54,53,55,54,53,55,57,58,57,58,59,58,58];
+
+/* ── Per-theme chart cfg (series + grid/tick/tooltip/fonts) ── */
+const CHART_CFG = {
+  'orig-light': { seenLine:'#228B22', seenTop:'rgba(50,205,50,0.30)', seenBot:'rgba(50,205,50,0.02)', adsb:'#00A0F0', mlat:'#888888', tisb:'#ffcc00', npos:'#E30022', amber:'#d98c00', purple:'#0011EE', red:'#E30022', grid:'rgba(0,0,0,0.07)', tick:'rgba(0,0,0,0.45)', dotColor:'rgba(0,0,0,0.18)', fg:'#1a1a1a', fgSub:'#666', tooltipBg:'#ffffff', mono:false },
+  'orig-dark':  { seenLine:'#5cb85c', seenTop:'rgba(56,102,25,0.55)', seenBot:'rgba(56,102,25,0.05)', adsb:'#00A0F0', mlat:'#7f8c8d', tisb:'#cca300', npos:'#c52b2f', amber:'#cca300', purple:'#7fc7ff', red:'#c52b2f', grid:'rgba(255,255,255,0.07)', tick:'rgba(255,255,255,0.3)', dotColor:'rgba(255,255,255,0.12)', fg:'#f2f5f4', fgSub:'#9aa0a0', tooltipBg:'#212427', mono:false },
+  'aviation':   { seenLine:'#4ade80', seenTop:'rgba(74,222,128,0.28)', seenBot:'rgba(74,222,128,0.03)', adsb:'#22d3ee', mlat:'rgba(255,255,255,0.5)', tisb:'#facc15', npos:'#f87171', amber:'#facc15', purple:'#22d3ee', red:'#f87171', grid:'rgba(74,222,128,0.08)', tick:'rgba(74,222,128,0.45)', dotColor:'rgba(74,222,128,0.2)', fg:'#4ade80', fgSub:'rgba(74,222,128,0.45)', tooltipBg:'#0a1a0e', mono:true },
+  'minimal':    { seenLine:'#16a34a', seenTop:'rgba(34,197,94,0.14)', seenBot:'rgba(34,197,94,0.01)', adsb:'#3b82f6', mlat:'#94a3b8', tisb:'#f59e0b', npos:'#ef4444', amber:'#f59e0b', purple:'#6366f1', red:'#ef4444', grid:'rgba(0,0,0,0.05)', tick:'rgba(0,0,0,0.3)', dotColor:'rgba(0,0,0,0.22)', fg:'#1a1a1a', fgSub:'#888', tooltipBg:'#ffffff', mono:false },
+  'night':      { seenLine:'#818cf8', seenTop:'rgba(129,140,248,0.30)', seenBot:'rgba(129,140,248,0.02)', adsb:'#38bdf8', mlat:'#64748b', tisb:'#fb923c', npos:'#f87171', amber:'#fb923c', purple:'#a78bfa', red:'#f87171', grid:'rgba(255,255,255,0.05)', tick:'rgba(255,255,255,0.28)', dotColor:'rgba(255,255,255,0.16)', fg:'#e2e8f0', fgSub:'#94a3b8', tooltipBg:'#1e293b', mono:false },
+  'retro':      { seenLine:'#5db329', seenTop:'rgba(82,163,34,0.52)', seenBot:'rgba(82,163,34,0.06)', adsb:'#00e0ff', mlat:'rgba(220,220,220,0.65)', tisb:'#e8820a', npos:'#cc2e2e', amber:'#e8820a', purple:'#00e0ff', red:'#cc2e2e', grid:'rgba(255,255,255,0.05)', tick:'rgba(200,200,200,0.45)', dotColor:'rgba(255,255,255,0.1)', fg:'#c9c9c9', fgSub:'#5a5a5a', tooltipBg:'#1c1c1c', mono:true },
+};
+
+const THEMES = [
+  { id:'orig-light', name:'Original · Light', sw:'#32CD32' },
+  { id:'orig-dark',  name:'Original · Dark',  sw:'#386619' },
+  { id:'aviation',   name:'Aviation',         sw:'#4ade80' },
+  { id:'minimal',    name:'Minimal',          sw:'#16a34a' },
+  { id:'night',      name:'Night',            sw:'#818cf8' },
+  { id:'retro',      name:'Retro',            sw:'#5db329' },
+];
+
+function dotGrid(dotColor){ return { id:'dotGrid', afterDraw(c){ const {ctx,chartArea,scales}=c; if(!chartArea||!scales.x||!scales.y)return; const xs=scales.x.ticks.map((_,i)=>scales.x.getPixelForTick(i)); const ys=scales.y.ticks.map((_,i)=>scales.y.getPixelForTick(i)); ctx.save(); ctx.fillStyle=dotColor; for(const x of xs)for(const y of ys){ if(x>=chartArea.left&&x<=chartArea.right&&y>=chartArea.top&&y<=chartArea.bottom){ ctx.beginPath(); ctx.arc(x,y,1.6,0,Math.PI*2); ctx.fill(); } } ctx.restore(); } }; }
+
+function grad(ctx,h,top,bot){ const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,top); g.addColorStop(1,bot); return g; }
+function fam(cfg){ return cfg.mono?"'Space Mono'":"'Space Grotesk'"; }
+function baseOpts(cfg,yMin,yMax,rightAxis,yStep){
+  const ax={ color:cfg.tick, font:{family:fam(cfg),size:9} };
+  const o={ responsive:true, maintainAspectRatio:false, animation:false, interaction:{mode:'index',intersect:false},
+    plugins:{ legend:{display:false}, tooltip:{ backgroundColor:cfg.tooltipBg, titleColor:cfg.fg, bodyColor:cfg.fgSub, borderColor:cfg.grid, borderWidth:1, padding:10, cornerRadius:cfg.mono?2:8, titleFont:{family:fam(cfg),size:11}, bodyFont:{family:fam(cfg),size:11} } },
+    scales:{ x:{ grid:{color:cfg.grid}, border:{display:false}, ticks:{...ax,maxRotation:0,autoSkip:true,maxTicksLimit:8} },
+             y:{ min:yMin,max:yMax, grid:{color:cfg.grid}, border:{display:false}, ticks:{...ax, stepSize:yStep} } } };
+  if(rightAxis){ o.scales.yRight={ position:'right', min:rightAxis.min, max:rightAxis.max, grid:{display:false}, border:{display:false}, ticks:{...ax} }; }
+  return o;
+}
+const baseDS={ tension:0.38, pointRadius:0, pointHoverRadius:4, borderWidth:2 };
+
+let charts=[];
+function destroyAll(){ charts.forEach(c=>c.destroy()); charts=[]; }
+
+function build(theme){
+  const cfg=CHART_CFG[theme];
+  destroyAll();
+
+  // legend dots for aircraft chart
+  document.getElementById('lg-adsb').style.background=cfg.adsb;
+  document.getElementById('lg-mlat').style.background=cfg.mlat;
+  document.getElementById('lg-tisb').style.background=cfg.tisb;
+  document.getElementById('lg-npos').style.background=cfg.npos;
+
+  const mk=(id,datasets,opts,plugins)=>{ const el=document.getElementById(id); charts.push(new Chart(el,{type:'line',data:{labels:LABELS,datasets},options:opts,plugins:plugins||[]})); };
+  const ctxOf=id=>document.getElementById(id).getContext('2d');
+
+  // Message rate: messages area + 7d avg + positions on right axis
+  mk('c-msgrate',[
+    {...baseDS,label:'Messages',data:MSG,borderColor:cfg.seenLine,backgroundColor:grad(ctxOf('c-msgrate'),300,cfg.seenTop,cfg.seenBot),fill:true,borderWidth:1.5,order:3},
+    {...baseDS,label:'7-Day Avg',data:AVG7,borderColor:cfg.fgSub,backgroundColor:'transparent',borderWidth:1.5,borderDash:[5,3],order:2},
+    {...baseDS,label:'Positions/s',data:POS,borderColor:cfg.adsb,backgroundColor:'transparent',borderWidth:2,yAxisID:'yRight',order:1},
+  ], baseOpts(cfg,0,1200,{min:0,max:130},300), [dotGrid(cfg.dotColor)]);
+
+  // Aircraft (5 series — exact format from reference)
+  mk('c-aircraft',[
+    {...baseDS,label:'Seen/Tracked',data:SEEN,borderColor:cfg.seenLine,backgroundColor:grad(ctxOf('c-aircraft'),360,cfg.seenTop,cfg.seenBot),fill:true,borderWidth:1.5,order:5},
+    {...baseDS,label:'ADS-B',data:ADSB,borderColor:cfg.adsb,backgroundColor:'transparent',order:4},
+    {...baseDS,label:'MLAT',data:MLAT,borderColor:cfg.mlat,backgroundColor:'transparent',borderWidth:1.5,order:3},
+    {...baseDS,label:'TIS-B',data:TISB,borderColor:cfg.tisb,backgroundColor:'transparent',borderWidth:1.5,order:2},
+    {...baseDS,label:'w/o pos',data:NPOS,borderColor:cfg.npos,backgroundColor:'transparent',borderWidth:1.5,order:1},
+  ], baseOpts(cfg,0,200,{min:0,max:200},50), [dotGrid(cfg.dotColor)]);
+
+  // Tracks
+  mk('c-tracks',[
+    {...baseDS,label:'New Tracks/min',data:TRACKS,borderColor:cfg.adsb,backgroundColor:grad(ctxOf('c-tracks'),300,cfg.seenTop,cfg.seenBot),fill:true,borderWidth:2,order:1},
+  ], baseOpts(cfg,0,500,null,100), [dotGrid(cfg.dotColor)]);
+
+  // Range: max + median (band via fill between)
+  mk('c-range',[
+    {...baseDS,label:'Max',data:RNG_MAX,borderColor:cfg.amber,backgroundColor:'transparent',borderWidth:1.5,order:2},
+    {...baseDS,label:'Median',data:RNG_MED,borderColor:cfg.amber,backgroundColor:grad(ctxOf('c-range'),300,hexA(cfg.amber,0.22),hexA(cfg.amber,0.01)),fill:true,borderWidth:2.5,order:1},
+  ], baseOpts(cfg,0,300,null,100), [dotGrid(cfg.dotColor)]);
+
+  // Signal
+  mk('c-signal',[
+    {...baseDS,label:'Peak',data:SIG_PEAK,borderColor:cfg.purple,backgroundColor:'transparent',borderWidth:1.5,order:2},
+    {...baseDS,label:'Median',data:SIG_MED,borderColor:cfg.purple,backgroundColor:grad(ctxOf('c-signal'),300,hexA(cfg.purple,0.22),hexA(cfg.purple,0.01)),fill:true,borderWidth:2.5,order:1},
+  ], baseOpts(cfg,-50,-5,null,10), [dotGrid(cfg.dotColor)]);
+
+  // Aircraft message rate
+  mk('c-acmsg',[
+    {...baseDS,label:'msg/ac/s',data:ACMSG,borderColor:cfg.seenLine,backgroundColor:grad(ctxOf('c-acmsg'),300,cfg.seenTop,cfg.seenBot),fill:true,borderWidth:2,order:1},
+  ], baseOpts(cfg,0,8,null,2), [dotGrid(cfg.dotColor)]);
+
+  // CPU user+system stacked area
+  const cpuOpts=baseOpts(cfg,0,100,null,25); cpuOpts.scales.y.stacked=true;
+  mk('c-cpu',[
+    {...baseDS,label:'User',data:CPU_USER,borderColor:cfg.adsb,backgroundColor:hexA(cfg.adsb,0.35),fill:true,borderWidth:1.5,order:2},
+    {...baseDS,label:'System',data:CPU_SYS,borderColor:cfg.purple,backgroundColor:hexA(cfg.purple,0.4),fill:true,borderWidth:1.5,order:1},
+  ], cpuOpts, [dotGrid(cfg.dotColor)]);
+
+  // Temperature
+  mk('c-temp',[
+    {...baseDS,label:'Core Temp',data:TEMP,borderColor:cfg.red,backgroundColor:grad(ctxOf('c-temp'),300,hexA(cfg.red,0.2),hexA(cfg.red,0.01)),fill:true,borderWidth:2,order:1},
+  ], baseOpts(cfg,20,80,null,20), [dotGrid(cfg.dotColor)]);
+}
+
+/* hex/rgba -> rgba with alpha */
+function hexA(c,a){
+  if(c.startsWith('rgba')) return c.replace(/[\d.]+\)$/,a+')');
+  if(c.startsWith('rgb(')) return c.replace('rgb(','rgba(').replace(')',','+a+')');
+  let h=c.replace('#',''); if(h.length===3)h=h.split('').map(x=>x+x).join('');
+  const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+/* ── theme switcher ── */
+const tg=document.getElementById('theme-group');
+THEMES.forEach(t=>{ const b=document.createElement('button'); b.className='btn theme-btn'; b.dataset.id=t.id; b.innerHTML='<span class="sw" style="background:'+t.sw+'"></span>'+t.name; b.onclick=()=>setTheme(t.id,b); tg.appendChild(b); });
+function setTheme(id,btn){ document.body.setAttribute('data-theme',id); document.querySelectorAll('#theme-group .btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); build(id); }
+function setTF(btn){ document.querySelectorAll('#tf-group .btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+
+setTheme('night', tg.querySelector('[data-id="night"]'));
+</script>
+
+
+</body></html>
