@@ -1,9 +1,4 @@
-"""Pure ADS-B aircraft statistics — no collectd, no I/O.
-
-These functions are lifted verbatim (logic-identical) from lib/dump1090.py so the
-Telegraf collector produces numbers identical to the legacy collectd pipeline.
-During the migration both copies coexist; Phase D consolidates them into this one.
-"""
+"""Pure ADS-B aircraft statistics — no I/O."""
 
 import math
 

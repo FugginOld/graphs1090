@@ -1,73 +1,85 @@
 # Ponytail Audit Report
 
 Scope: over-engineering and complexity only. Ranked biggest cut first.
+Generated against current tree (Phase D complete, collectd stack removed).
 
 ---
 
 ## Findings
 
-**`delete:` `lib/dump1090.py` + `lib/system_stats.py` + `lib/prune-value.py`**
-Legacy collectd Python. `adsb_telegraf.py` comment says "Phase D consolidates them into this one"; commit history confirms Phase D is done. Nothing to replace.
-→ [`lib/`](lib/)
+**`delete:` `install.sh`**
+~150 lines still targeting the collectd/rrdtool stack. Installs `collectd-core`, `rrdtool`,
+`wget`, `unzip`, `bash-builtins`; includes a special-case Ubuntu Jammy collectd .deb
+workaround, collectd service checks, and `malarky.sh` invocation. None of this applies
+to the live Telegraf + InfluxDB + Grafana stack. Needs a full rewrite or delete.
+→ [`install.sh`](install.sh)
 
 ---
 
-**`delete:` `tests/test_dump1090.py` + `tests/conftest.py` mock_collectd stub**
-Tests and collectd stub exist solely to support the lib files above. Removing the libs makes these dead. `conftest.py` can be deleted entirely if no remaining tests use it.
-→ [`tests/`](tests/)
+**`delete:` `uninstall.sh`**
+~40 lines referencing `collectd`, `gunzip.sh`, `lighty-disable-mod adsb-graphs`, and
+collectd service management. Running this against a Telegraf install would leave it broken.
+→ [`uninstall.sh`](uninstall.sh)
 
 ---
 
-**`delete:` RRD/collectd scripts in `scripts/`**
-`rrd-dump.sh`, `rrd-integrate-old.sh`, `rrd-restore.sh`, `rem_rra.sh`, `malarky.sh`, `stopMalarky.sh`, `readback.sh`, `writeback.sh`, `scatter.sh`, `new-format.sh`, `prune.sh`, `prune-range.sh` — all RRD or collectd lifecycle scripts. The last two commits exist specifically to remove this stack.
-→ [`scripts/`](scripts/)
+**`shrink:` `adsb_collector.conf.example` — strip ~50 dead option lines**
+Active config keys for the Telegraf collector: `instance`, `url_1090`, `url_978`,
+`url_airspy`, `url_1090_signal`, `interval`. Everything below `interval` is RRDtool /
+graphs1090 era: `graph_size`, `font_size`, `color_scheme`, scatter settings, axis scaling
+ratios, `TEMP_MULTIPLIER`, `hide_system` (with a reference to `collectd.conf`), rrdtool
+timezone, custom PNG dimensions, `swidth`/`sheight`/`lwidth`/`lheight`. None consumed by
+any current code.
+→ [`collector/adsb_collector.conf.example`](collector/adsb_collector.conf.example)
 
 ---
 
-**`delete:` `collector/decommission.sh` + `bringup-slice.sh` + `cutover.sh`**
-One-time migration scripts. Migration is complete.
-→ [`collector/`](collector/)
+**`delete:` `config/default`**
+Empty file. No content, no callers.
+→ [`config/default`](config/default)
 
 ---
 
-**`delete:` `config/collectd.conf`, `config/hide_system-collectd.conf`, `config/malarky.conf`**
-Collectd config files for a stack that has been removed.
-→ [`config/`](config/)
+**`delete:` `collector/__pycache__/adsb_telegraf.cpython-313.pyc`**
+Compiled binary committed to the repo. `.gitignore` already lists `__pycache__/` and
+`*.pyc`, but this file is tracked. `git rm --cached collector/__pycache__/adsb_telegraf.cpython-313.pyc`.
+→ [`collector/__pycache__/`](collector/__pycache__/)
 
 ---
 
-**`stdlib:` `load_config()` hand-rolled INI parser**
-30 lines of manual `split('=', 1)` / strip / case-fold. `configparser.ConfigParser()` with `read()` and `os.environ` fallbacks covers all the same keys in ~8 lines.
-→ [`collector/adsb_telegraf.py`](collector/adsb_telegraf.py)
+**`shrink:` urllib2 compat shim in `adsb_telegraf.py`**
+
+```python
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
+```
+
+Python 2 EOL was 2020; shebang is `#!/usr/bin/env python3`. Replace with direct import.
+→ [`collector/adsb_telegraf.py:22-24`](collector/adsb_telegraf.py#L22-L24)
 
 ---
 
-**`yagni:` `adsb-graphs-themes/` (aviation.sh, minimal.sh, night.sh, retro.sh)**
-4 theme-switcher shell scripts with no caller in `install.sh` or any other script. Delete unless theme selection is actively shipped.
-→ [`adsb-graphs-themes/`](adsb-graphs-themes/)
+**`shrink:` stale migration notes in `adsb_telegraf.py` docstring**
+Lines `"Phase B: adsb_aircraft, ..."` and `"Remaining: 978, airspy, system metrics."`
+are mid-migration breadcrumbs. Phase B is complete; 978/airspy are wired. Delete both lines.
+Also: `"the legacy collectd plugin used"` in the first sentence — historical noise.
+→ [`collector/adsb_telegraf.py:4-14`](collector/adsb_telegraf.py#L4-L14)
 
 ---
 
-**`yagni:` `config/http/95-adsb-graphs-otherport.conf`**
-Alternate-port nginx block with no documented use case and no reference in `install.sh`.
-→ [`config/http/`](config/http/)
-
----
-
-**`delete:` `SUMMARY.md`**
-7.9 KB AI-generated project summary duplicating README content. Not referenced anywhere.
-→ [`SUMMARY.md`](SUMMARY.md)
-
----
-
-**`delete:` `scripts/generate-adsb.im-backup.sh`, `scripts/gunzip.sh`, `scripts/boot.sh`**
-One-off utilities with no callers in `install.sh` or cron config.
-→ [`scripts/`](scripts/)
+**`shrink:` stale migration note in `adsb_stats.py` docstring**
+`"During the migration both copies coexist; Phase D consolidates them into this one."`
+Phase D is done; the statement is now false. Delete the sentence.
+→ [`collector/adsb_stats.py:3-5`](collector/adsb_stats.py#L3-L5)
 
 ---
 
 ## Summary
 
-**net: ~-500 lines, -0 deps possible.**
+**net: ~-250 lines, -0 deps possible.**
 
-All cuts are dead code from the collectd→Telegraf migration that did not fully clean up after itself. The live stack (`adsb_telegraf.py`, `telegraf/`, `influxdb/`, `grafana/`) is lean.
+All cuts are residue from the collectd→Telegraf migration. The live stack
+(`adsb_telegraf.py`, `adsb_stats.py`, `telegraf/`, `influxdb/`, `grafana/`) is lean.
+Previous report findings are resolved — those files were deleted in Phase D.

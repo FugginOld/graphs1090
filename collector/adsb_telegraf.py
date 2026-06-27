@@ -1,17 +1,12 @@
 #!/usr/bin/env python3
 """adsb-graphs Telegraf collector.
 
-Fetches the same dump1090/readsb JSON the legacy collectd plugin used and emits
-InfluxDB line protocol on stdout. Two run modes:
+Fetches dump1090/readsb JSON and emits InfluxDB line protocol on stdout. Two run modes:
 
   execd (default): Telegraf drives it via STDIN — one collection per newline.
       [[inputs.execd]] command=["python3", ".../adsb_telegraf.py"] signal="STDIN"
   exec (--once):   collect a single batch, print, exit. Fallback for platforms
       where execd misbehaves:  [[inputs.exec]] commands=["... --once"]
-
-Phase B: adsb_aircraft, adsb_messages, adsb_range, adsb_signal, adsb_cpu,
-         adsb_tracks, adsb_gain (all 1090 measurements).
-Remaining: 978, airspy, system metrics.
 """
 
 import os
@@ -19,10 +14,7 @@ import sys
 import json
 from contextlib import closing
 
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib2 import urlopen
+from urllib.request import urlopen
 
 from adsb_stats import compute_aircraft_stats
 
