@@ -1,0 +1,2 @@
+# ponytail: only E741 fires, and it's `l` for "line" in comprehensions — harmless. Drop this ignore if you rename them.
+lint.ignore = ["E741"]
